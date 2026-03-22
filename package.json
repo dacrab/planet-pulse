@@ -9,9 +9,9 @@
     "preview": "vite preview"
   },
   "devDependencies": {
-    "@tailwindcss/vite": "^4.2.1",
-    "tailwindcss": "^4.2.1",
-    "vite": "^8.0.0",
+    "@tailwindcss/vite": "^4.2.2",
+    "tailwindcss": "^4.2.2",
+    "vite": "^8.0.1",
     "vite-plugin-solid": "^2.11.11"
   },
   "peerDependencies": {
@@ -19,7 +19,7 @@
   },
   "dependencies": {
     "@solidjs/meta": "^0.29.4",
-    "@solidjs/router": "^0.15.4",
+    "@solidjs/router": "^0.16.1",
     "solid-js": "^1.9.11"
   }
 }
