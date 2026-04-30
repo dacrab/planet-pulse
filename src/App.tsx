@@ -1,67 +1,16 @@
-import {
-  Component,
-  createSignal,
-  createEffect,
-  onMount,
-  onCleanup,
-  For,
-  Show,
-} from 'solid-js';
+import { Component, createSignal, createEffect, onMount, onCleanup, For, Show } from 'solid-js';
 import { createStore } from 'solid-js/store';
 import { A } from '@solidjs/router';
 import { Title, Meta } from '@solidjs/meta';
 import { projects } from './data/projects';
 import ForSale from './components/ForSale';
 
-const NAV_LINKS = [
-  { name: 'Work', href: '#work' },
-  { name: 'Studio', href: '#about' },
-  { name: 'Approach', href: '#services' },
-  { name: 'Contact', href: '#contact' },
-] as const;
-
-const SOCIALS_SHORT = ['Tw', 'Ig', 'Li'] as const;
-const SOCIALS = ['Twitter', 'Instagram', 'LinkedIn'] as const;
-
-const STATS = [
-  { label: 'Years active', value: 6 },
-  { label: 'Projects completed', value: 41 },
-  { label: 'People', value: 2 },
-] as const;
-
-const PRINCIPLES = [
-  {
-    title: 'We work with fewer clients, not more',
-    desc: "Four to six projects a year. Enough to do each one properly. We have turned down work from companies most studios would kill for — because the timing was wrong, or the brief was vague, or we didn't believe in what they were building.",
-  },
-  {
-    title: 'The work has to stand on its own',
-    desc: "We don't enter awards. We don't post process threads. If the identity doesn't work in the real world — on a building, in a product, under pressure — it doesn't work. Everything else is decoration.",
-  },
-  {
-    title: 'We write our own briefs',
-    desc: "Most briefs are wish lists written by committee. We spend the first two weeks of every project tearing the brief apart and rebuilding it. Clients who trust us to do that get better work. Clients who don't tend to go elsewhere.",
-  },
-] as const;
-
-const CAPABILITIES = [
-  'Brand Identity', 'Visual Systems', 'Web Design',
-  'Digital Product', 'Design Systems', 'Art Direction',
-  'Environmental', 'Custom Type',
-] as const;
-
 const App: Component = () => {
   const [time, setTime] = createSignal('');
   const [activeWork, setActiveWork] = createSignal<number | null>(null);
   const [menuOpen, setMenuOpen] = createSignal(false);
-  const [menuClosing, setMenuClosing] = createSignal(false);
   const [scrollProgress, setScrollProgress] = createSignal(0);
   const [heroReady, setHeroReady] = createSignal(false);
-
-  const closeMenu = () => {
-    setMenuClosing(true);
-    setTimeout(() => { setMenuOpen(false); setMenuClosing(false); }, 320);
-  };
 
   const [visibleSections, setVisibleSections] = createStore<Record<string, boolean>>({
     work: false,
@@ -75,13 +24,11 @@ const App: Component = () => {
   });
 
   onMount(() => {
-    // Slight delay so first paint completes before hero animates
-    const heroTimer = setTimeout(() => setHeroReady(true), 80);
+    setTimeout(() => setHeroReady(true), 80);
 
     const updateTime = () => {
       setTime(new Date().toLocaleTimeString('de-DE', {
-        hour: '2-digit', minute: '2-digit', hour12: false,
-        timeZone: 'Europe/Berlin',
+        hour: '2-digit', minute: '2-digit', hour12: false, timeZone: 'Europe/Berlin',
       }));
     };
     updateTime();
@@ -93,7 +40,6 @@ const App: Component = () => {
     };
     window.addEventListener('scroll', handleScroll, { passive: true });
 
-    // Section entrance observer
     const sectionObserver = new IntersectionObserver(
       (entries) => entries.forEach(entry => {
         if (entry.target.id) setVisibleSections(entry.target.id, entry.isIntersecting);
@@ -103,7 +49,6 @@ const App: Component = () => {
     document.querySelectorAll('section[id]').forEach(s => sectionObserver.observe(s));
 
     onCleanup(() => {
-      clearTimeout(heroTimer);
       clearInterval(timeInterval);
       window.removeEventListener('scroll', handleScroll);
       sectionObserver.disconnect();
@@ -116,41 +61,36 @@ const App: Component = () => {
       <Title>Bureau — Brand & Digital, Berlin</Title>
       <Meta name="description" content="Bureau is Jonas Ek and Mara Voss. Brand and digital for climate and deep tech companies." />
 
-      {/* Scroll progress */}
       <div
         class="fixed top-0 left-0 h-[1px] bg-[#1a1a1a] z-[200] transition-none"
         style={`width: ${scrollProgress() * 100}%`}
       />
 
-      {/* Menu overlay */}
       <Show when={menuOpen()}>
-        <div
-          class="fixed inset-0 bg-[#1a1a1a] z-50 flex flex-col justify-between p-6 md:p-12"
-          style={menuClosing()
-            ? 'animation: menuOut 0.32s cubic-bezier(0.4,0,1,1) both'
-            : 'animation: menuIn 0.4s cubic-bezier(0.16,1,0.3,1) both'}
-        >
-          <div
-            class="flex justify-between items-center"
-            style={menuClosing() ? '' : 'animation: fadeIn 0.3s ease-out 0.15s both'}
-          >
+        <div class="fixed inset-0 bg-[#1a1a1a] z-50 flex flex-col justify-between p-6 md:p-12 animate-menu-in">
+          <div class="flex justify-between items-center">
             <span class="text-[#f0ede8] font-medium tracking-tight text-lg">Bureau</span>
             <button
               class="text-[#f0ede8] text-sm opacity-60 hover:opacity-100 transition-opacity py-2 px-1"
-              onClick={closeMenu}
+              onClick={() => setMenuOpen(false)}
             >
               Close
             </button>
           </div>
 
           <nav class="flex flex-col gap-1">
-            <For each={NAV_LINKS}>
+            <For each={[
+              { name: 'Work', href: '#work' },
+              { name: 'Studio', href: '#about' },
+              { name: 'Approach', href: '#services' },
+              { name: 'Contact', href: '#contact' },
+            ]}>
               {(item, i) => (
                 <a
                   href={item.href}
                   class="group flex items-baseline gap-4 md:gap-6 text-[#f0ede8] text-[clamp(2rem,9vw,6rem)] font-light leading-none tracking-tight py-3 border-b border-[#f0ede8]/10 hover:border-[#f0ede8]/30 transition-colors duration-300"
-                  onClick={closeMenu}
-                  style={menuClosing() ? '' : `animation: slideUp 0.5s cubic-bezier(0.16,1,0.3,1) ${0.1 + i() * 0.08}s both`}
+                  onClick={() => setMenuOpen(false)}
+                  style={`animation: slideUp 0.5s cubic-bezier(0.16,1,0.3,1) ${0.1 + i() * 0.08}s both`}
                 >
                   <span class="text-[#f0ede8]/20 text-xs font-mono w-5 shrink-0">{String(i() + 1).padStart(2, '0')}</span>
                   <span class="group-hover:translate-x-2 transition-transform duration-300">{item.name}</span>
@@ -159,10 +99,7 @@ const App: Component = () => {
             </For>
           </nav>
 
-          <div
-            class="flex justify-between items-end text-[#f0ede8]"
-            style={menuClosing() ? '' : 'animation: slideUp 0.5s cubic-bezier(0.16,1,0.3,1) 0.42s both'}
-          >
+          <div class="flex justify-between items-end text-[#f0ede8]" style="animation: slideUp 0.5s cubic-bezier(0.16,1,0.3,1) 0.42s both">
             <div>
               <p class="text-xs opacity-40 mb-1">New projects</p>
               <a href="mailto:hello@bureau.studio" class="text-sm hover:opacity-60 transition-opacity">
@@ -170,7 +107,7 @@ const App: Component = () => {
               </a>
             </div>
             <div class="flex gap-5 text-sm opacity-40">
-              <For each={SOCIALS_SHORT}>
+              <For each={['Tw', 'Ig', 'Li']}>
                 {(s) => <a href="#" class="hover:opacity-100 transition-opacity py-1">{s}</a>}
               </For>
             </div>
@@ -178,7 +115,6 @@ const App: Component = () => {
         </div>
       </Show>
 
-      {/* Header */}
       <header class="fixed top-0 left-0 right-0 z-40 bg-[#f0ede8]/80 backdrop-blur-sm border-b border-[#1a1a1a]/5">
         <nav
           class="flex justify-between items-center px-6 md:px-12 py-5"
@@ -197,7 +133,6 @@ const App: Component = () => {
         </nav>
       </header>
 
-      {/* Hero */}
       <section class="min-h-screen flex flex-col justify-between px-6 md:px-12 pt-28 md:pt-36 pb-10 md:pb-12">
         <div class="space-y-8 md:space-y-0 md:grid md:grid-cols-12 md:gap-8">
           <div class="md:col-span-9">
@@ -243,7 +178,6 @@ const App: Component = () => {
         </div>
       </section>
 
-      {/* Work */}
       <section
         id="work"
         class="px-6 md:px-12 py-20 md:py-32"
@@ -288,7 +222,6 @@ const App: Component = () => {
                   </svg>
                 </div>
 
-                {/* Hover preview — desktop only, scaleInFast for snappy appearance */}
                 <Show when={activeWork() === index()}>
                   <div
                     class="fixed top-1/2 right-20 w-[300px] h-[400px] pointer-events-none z-30 hidden lg:block overflow-hidden"
@@ -308,7 +241,6 @@ const App: Component = () => {
         </div>
       </section>
 
-      {/* Studio / About */}
       <section
         id="about"
         class="px-6 md:px-12 py-20 md:py-32 bg-[#1a1a1a] text-[#f0ede8]"
@@ -337,11 +269,15 @@ const App: Component = () => {
             </p>
           </div>
           <div class="md:col-span-4 md:col-start-9 md:pt-20">
-            <For each={STATS}>
+            <For each={[
+              { label: 'Years active', value: 6 },
+              { label: 'Projects completed', value: 41 },
+              { label: 'People', value: 2 },
+            ]}>
               {(stat) => (
                 <div class="flex justify-between items-baseline border-b border-[#f0ede8]/10 py-4 md:py-5">
                   <span class="text-sm opacity-40">{stat.label}</span>
-                  <AnimatedNumber value={stat.value} active={visibleSections.about} />
+                  <span class="text-xl md:text-2xl font-light">{stat.value}</span>
                 </div>
               )}
             </For>
@@ -354,7 +290,6 @@ const App: Component = () => {
         </div>
       </section>
 
-      {/* Approach */}
       <section
         id="services"
         class="px-6 md:px-12 py-20 md:py-32"
@@ -369,7 +304,20 @@ const App: Component = () => {
             <h2 class="text-xs uppercase tracking-[0.2em] opacity-30 md:sticky md:top-24">How we work</h2>
           </div>
           <div class="md:col-span-7">
-            <For each={PRINCIPLES}>
+            <For each={[
+              {
+                title: 'We work with fewer clients, not more',
+                desc: "Four to six projects a year. Enough to do each one properly. We have turned down work from companies most studios would kill for — because the timing was wrong, or the brief was vague, or we didn't believe in what they were building.",
+              },
+              {
+                title: 'The work has to stand on its own',
+                desc: "We don't enter awards. We don't post process threads. If the identity doesn't work in the real world — on a building, in a product, under pressure — it doesn't work. Everything else is decoration.",
+              },
+              {
+                title: 'We write our own briefs',
+                desc: "Most briefs are wish lists written by committee. We spend the first two weeks of every project tearing the brief apart and rebuilding it. Clients who trust us to do that get better work. Clients who don't tend to go elsewhere.",
+              },
+            ]}>
               {(item, i) => (
                 <div class="border-t border-[#1a1a1a]/10 py-7 md:py-8">
                   <div class="flex gap-5 md:gap-10">
@@ -386,7 +334,7 @@ const App: Component = () => {
             <div class="mt-12 pt-8 border-t border-[#1a1a1a]/10">
               <p class="text-xs uppercase tracking-[0.2em] opacity-30 mb-5">What we do</p>
               <div class="flex flex-wrap gap-2 md:gap-3">
-                <For each={CAPABILITIES}>
+                <For each={['Brand Identity', 'Visual Systems', 'Web Design', 'Digital Product', 'Design Systems', 'Art Direction', 'Environmental', 'Custom Type']}>
                   {(cap) => (
                     <span class="text-xs md:text-sm px-3 md:px-4 py-1.5 md:py-2 border border-[#1a1a1a]/15 rounded-full opacity-50 hover:opacity-100 transition-opacity duration-300">
                       {cap}
@@ -399,7 +347,6 @@ const App: Component = () => {
         </div>
       </section>
 
-      {/* Contact */}
       <section
         id="contact"
         class="px-6 md:px-12 py-20 md:py-32 bg-[#1a1a1a] text-[#f0ede8]"
@@ -434,7 +381,7 @@ const App: Component = () => {
               <div>
                 <p class="opacity-30 mb-1 text-xs uppercase tracking-wider">Social</p>
                 <div class="flex flex-col gap-1">
-                  <For each={SOCIALS}>
+                  <For each={['Twitter', 'Instagram', 'LinkedIn']}>
                     {(s) => <a href="#" class="opacity-60 hover:opacity-100 transition-opacity duration-300 w-fit">{s}</a>}
                   </For>
                 </div>
@@ -444,7 +391,6 @@ const App: Component = () => {
         </div>
       </section>
 
-      {/* Footer */}
       <footer class="px-6 md:px-12 py-6 border-t border-[#1a1a1a]/10">
         <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-3 md:gap-4">
           <div class="text-xs opacity-25">© 2025 Bureau, Berlin</div>
@@ -456,29 +402,6 @@ const App: Component = () => {
       <ForSale />
     </div>
   );
-};
-
-const AnimatedNumber: Component<{ value: number; active: boolean }> = (props) => {
-  const [current, setCurrent] = createSignal(0);
-
-  createEffect(() => {
-    let interval: ReturnType<typeof setInterval> | undefined;
-    if (!props.active) {
-      setCurrent(0);
-    } else {
-      const step = Math.ceil(props.value / 30);
-      interval = setInterval(() => {
-        setCurrent(prev => {
-          const next = prev + step;
-          if (next >= props.value) { clearInterval(interval); return props.value; }
-          return next;
-        });
-      }, 30);
-    }
-    onCleanup(() => { if (interval) clearInterval(interval); });
-  });
-
-  return <span class="text-xl md:text-2xl font-light">{current()}</span>;
 };
 
 export default App;

@@ -1,7 +1,7 @@
-import { Component, createSignal, createEffect, createMemo, onMount, onCleanup, Show, For, batch } from 'solid-js';
+import { Component, createSignal, createEffect, onMount, onCleanup, Show, For } from 'solid-js';
 import { useParams, A, useNavigate } from '@solidjs/router';
 import { Title, Meta } from '@solidjs/meta';
-import { getProjectBySlug, projects, type Project } from '../data/projects';
+import { getProjectBySlug, getAdjacentProjects, type Project } from '../data/projects';
 import ForSale from '../components/ForSale';
 
 const ProjectPage: Component = () => {
@@ -11,116 +11,51 @@ const ProjectPage: Component = () => {
   const [project, setProject] = createSignal<Project | undefined>();
   const [imageLoaded, setImageLoaded] = createSignal(false);
   const [scrollY, setScrollY] = createSignal(0);
-  const [scrollProgress, setScrollProgress] = createSignal(0);
-  const [transitioning, setTransitioning] = createSignal(false);
-
-  // Track previous slug to detect navigation between projects
-  let prevSlug = '';
 
   createEffect(() => {
-    const slug = params.slug;
-    const p = getProjectBySlug(slug);
+    const p = getProjectBySlug(params.slug);
     if (!p) { navigate('/', { replace: true }); return; }
-
-    // First load — no transition
-    if (!prevSlug) {
-      prevSlug = slug;
-      batch(() => { setProject(p); setImageLoaded(false); });
-      return;
-    }
-
-    // Navigating between projects — play out then in
-    if (slug !== prevSlug) {
-      prevSlug = slug;
-      setTransitioning(true);
-      setTimeout(() => {
-        batch(() => { setProject(p); setImageLoaded(false); });
-        window.scrollTo(0, 0);
-        setTransitioning(false);
-      }, 280);
-    }
+    setProject(p);
+    setImageLoaded(false);
+    window.scrollTo(0, 0);
   });
 
   onMount(() => {
-    const handleScroll = () => {
-      const y = window.scrollY;
-      const maxScroll = document.body.scrollHeight - window.innerHeight;
-      batch(() => {
-        setScrollY(y);
-        setScrollProgress(maxScroll > 0 ? y / maxScroll : 0);
-      });
-    };
+    const handleScroll = () => setScrollY(window.scrollY);
     window.addEventListener('scroll', handleScroll, { passive: true });
-
     onCleanup(() => window.removeEventListener('scroll', handleScroll));
   });
 
-  // Reveal observer — re-runs when project() changes so <Show> has rendered.
-  // Observer ref stored outside rAF so cleanup can always reach it.
   createEffect(() => {
     if (!project()) return;
-
-    let observer: IntersectionObserver | null = null;
-
-    // Two rAFs: first lets Solid flush DOM, second ensures layout is complete
-    const raf1 = requestAnimationFrame(() => {
-      requestAnimationFrame(() => {
-        observer = new IntersectionObserver(
-          (entries) => {
-            entries.forEach(entry => {
-              if (entry.isIntersecting) {
-                entry.target.classList.add('is-visible');
-                observer?.unobserve(entry.target);
-              }
-            });
-          },
-          { threshold: 0.05, rootMargin: '0px 0px -20px 0px' }
-        );
-        document.querySelectorAll('.reveal').forEach(el => observer!.observe(el));
-      });
+    const observer = new IntersectionObserver(
+      (entries) => entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('is-visible');
+          observer.unobserve(entry.target);
+        }
+      }),
+      { threshold: 0.05, rootMargin: '0px 0px -20px 0px' }
+    );
+    requestAnimationFrame(() => {
+      document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
     });
-
-    onCleanup(() => {
-      cancelAnimationFrame(raf1);
-      observer?.disconnect();
-    });
+    onCleanup(() => observer.disconnect());
   });
 
-  const heroParallax = createMemo(() => `translateY(${scrollY() * 0.25}px)`);
-  const heroOpacity = createMemo(() => Math.max(0, 1 - scrollY() / 700));
+  const heroParallax = () => `translateY(${scrollY() * 0.25}px)`;
+  const heroOpacity = () => Math.max(0, 1 - scrollY() / 700);
+  const headerOpaque = () => scrollY() > 80;
 
-  // Header becomes opaque once user scrolls past ~80px into the hero
-  const headerOpaque = createMemo(() => scrollY() > 80);
-  const prevProject = createMemo(() => projects.find(p => p.slug === project()?.prevProject));
-  const nextProject = createMemo(() => projects.find(p => p.slug === project()?.nextProject));
+  const adjacent = () => project() ? getAdjacentProjects(project()!.slug) : { prev: undefined, next: undefined };
 
   return (
     <Show when={project()} fallback={<div class="min-h-screen bg-[#f0ede8]" />}>
       {(proj) => (
-        <div
-          class="min-h-screen bg-[#f0ede8] text-[#1a1a1a]"
-          style={transitioning()
-            ? 'animation: contentOut 0.28s cubic-bezier(0.4,0,1,1) both'
-            : 'animation: contentIn 0.5s cubic-bezier(0.16,1,0.3,1) both'}
-        >
+        <div class="min-h-screen bg-[#f0ede8] text-[#1a1a1a]">
           <Title>{proj().client} — Bureau</Title>
           <Meta name="description" content={proj().description} />
-          <Meta property="og:site_name" content="Bureau" />
-          <Meta property="og:title" content={`${proj().client} — Bureau`} />
-          <Meta property="og:description" content={proj().description} />
-          <Meta property="og:type" content="article" />
-          <Meta property="og:url" content={`https://solid-studio-zeta.vercel.app/project/${proj().slug}`} />
-          <Meta property="og:image" content={proj().heroImage} />
-          <Meta property="og:image:alt" content={`${proj().client} — Bureau project`} />
-          <Meta name="twitter:card" content="summary_large_image" />
-          <Meta name="twitter:title" content={`${proj().client} — Bureau`} />
-          <Meta name="twitter:description" content={proj().description} />
-          <Meta name="twitter:image" content={proj().heroImage} />
 
-          {/* Scroll progress */}
-          <div class="fixed top-0 left-0 h-[1px] bg-[#1a1a1a] z-[200]" style={`width: ${scrollProgress() * 100}%`} />
-
-          {/* Header — transparent over hero, opaque after scroll */}
           <header
             class="fixed top-0 left-0 right-0 z-40 transition-[background,backdrop-filter,border-color] duration-500 ease-out"
             style={{
@@ -147,13 +82,11 @@ const ProjectPage: Component = () => {
             </nav>
           </header>
 
-          {/* Hero */}
           <section class="relative h-[100svh] overflow-hidden">
             <div
               class="absolute inset-0"
               style={{ transform: heroParallax(), opacity: heroOpacity() }}
             >
-              {/* Image zooms in on load via animate-scale-in */}
               <img
                 src={proj().heroImage}
                 alt={proj().client}
@@ -176,7 +109,6 @@ const ProjectPage: Component = () => {
                 <span>·</span>
                 <span>{proj().year}</span>
               </div>
-              {/* Headline — clip reveal, each word staggered */}
               <h1 class="text-[clamp(2.8rem,10vw,8rem)] font-light leading-[0.88] tracking-[-0.04em] text-white mb-4 md:mb-0 overflow-hidden">
                 <span class="block animate-clip-reveal" style="animation-delay: 0.1s">
                   {proj().client}
@@ -191,7 +123,6 @@ const ProjectPage: Component = () => {
             </div>
           </section>
 
-          {/* Project brief */}
           <section class="px-6 md:px-12 py-16 md:py-28 border-b border-[#1a1a1a]/8">
             <div class="flex flex-wrap gap-x-4 gap-y-1 mb-10 md:hidden">
               <For each={proj().tags}>
@@ -220,7 +151,6 @@ const ProjectPage: Component = () => {
             </div>
           </section>
 
-          {/* Gallery */}
           <section class="px-6 md:px-12 py-12 md:py-16">
             <div class="flex flex-col gap-3 md:hidden">
               <For each={proj().gallery}>
@@ -267,7 +197,6 @@ const ProjectPage: Component = () => {
             </div>
           </section>
 
-          {/* Results */}
           <section class="px-6 md:px-12 py-16 md:py-28 bg-[#1a1a1a] text-[#f0ede8]">
             <div class="grid md:grid-cols-12 gap-8">
               <div class="md:col-span-2 md:col-start-2">
@@ -286,10 +215,9 @@ const ProjectPage: Component = () => {
             </div>
           </section>
 
-          {/* Prev / Next nav */}
           <section class="px-6 md:px-12 py-12 md:py-16">
             <div class="grid grid-cols-2 gap-3 md:gap-4">
-              <Show when={prevProject()}>
+              <Show when={adjacent().prev}>
                 {(prev) => (
                   <A
                     href={`/project/${prev().slug}`}
@@ -301,7 +229,7 @@ const ProjectPage: Component = () => {
                   </A>
                 )}
               </Show>
-              <Show when={nextProject()}>
+              <Show when={adjacent().next}>
                 {(next) => (
                   <A
                     href={`/project/${next().slug}`}
@@ -316,7 +244,6 @@ const ProjectPage: Component = () => {
             </div>
           </section>
 
-          {/* Footer */}
           <footer class="px-6 md:px-12 py-6 border-t border-[#1a1a1a]/10">
             <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-3 md:gap-4">
               <div class="text-xs opacity-25">© 2025 Bureau, Berlin</div>

@@ -2,30 +2,21 @@ import { Component, createSignal, onMount, onCleanup, Show } from 'solid-js';
 
 const ForSale: Component = () => {
   const [open, setOpen] = createSignal(false);
-  const [closing, setClosing] = createSignal(false);
 
-  const close = () => {
-    setClosing(true);
-    setTimeout(() => { setOpen(false); setClosing(false); }, 280);
-  };
-
-  // Close on Escape
   onMount(() => {
-    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape' && open()) close(); };
+    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape' && open()) setOpen(false); };
     window.addEventListener('keydown', onKey);
     onCleanup(() => window.removeEventListener('keydown', onKey));
   });
 
   return (
     <>
-      {/* Pill trigger — fixed bottom-right */}
       <button
         class="fixed bottom-6 right-6 z-[300] flex items-center gap-2 px-4 py-2.5 bg-[#1a1a1a] text-[#f0ede8] text-xs uppercase tracking-[0.15em] font-mono hover:bg-[#2a2a2a] transition-colors duration-300"
         style="animation: slideUp 0.6s cubic-bezier(0.16,1,0.3,1) 1.2s both"
-        onClick={() => open() ? close() : setOpen(true)}
+        onClick={() => setOpen(!open())}
         aria-label="This template is available for purchase"
       >
-        {/* Pulse dot */}
         <span class="relative flex h-1.5 w-1.5">
           <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#f0ede8] opacity-60" />
           <span class="relative inline-flex rounded-full h-1.5 w-1.5 bg-[#f0ede8]" />
@@ -33,15 +24,8 @@ const ForSale: Component = () => {
         Available
       </button>
 
-      {/* Panel */}
       <Show when={open()}>
-        <div
-          class="fixed bottom-20 right-6 z-[300] w-[min(360px,calc(100vw-3rem))] bg-[#1a1a1a] text-[#f0ede8] p-7 flex flex-col gap-6"
-          style={closing()
-            ? 'animation: contentOut 0.28s cubic-bezier(0.4,0,1,1) both'
-            : 'animation: contentIn 0.4s cubic-bezier(0.16,1,0.3,1) both'}
-        >
-          {/* Header */}
+        <div class="fixed bottom-20 right-6 z-[300] w-[min(360px,calc(100vw-3rem))] bg-[#1a1a1a] text-[#f0ede8] p-7 flex flex-col gap-6 animate-content-in">
           <div class="flex justify-between items-start">
             <div>
               <p class="text-[10px] uppercase tracking-[0.2em] opacity-40 mb-1">Template</p>
@@ -49,16 +33,14 @@ const ForSale: Component = () => {
             </div>
             <button
               class="text-[#f0ede8] opacity-40 hover:opacity-100 transition-opacity text-xs uppercase tracking-wider"
-              onClick={close}
+              onClick={() => setOpen(false)}
             >
               ✕
             </button>
           </div>
 
-          {/* Divider */}
           <div class="h-px bg-[#f0ede8]/10" />
 
-          {/* Details */}
           <div class="space-y-4 text-sm">
             <div>
               <p class="opacity-40 text-xs uppercase tracking-wider mb-1.5">What's included</p>
@@ -78,10 +60,8 @@ const ForSale: Component = () => {
             </div>
           </div>
 
-          {/* Divider */}
           <div class="h-px bg-[#f0ede8]/10" />
 
-          {/* CTA */}
           <div class="flex flex-col gap-3">
             <a
               href="mailto:vkavouras@proton.me?subject=Bureau Template — Purchase Inquiry"

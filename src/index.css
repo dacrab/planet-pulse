@@ -1,9 +1,7 @@
 @import "tailwindcss";
 
-/* Base */
 html {
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-  font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -11,119 +9,92 @@ html {
 body {
   background-color: #f0ede8;
   color: #1a1a1a;
-  line-height: 1.5;
 }
 
-/* Pointer on all interactive elements */
-a, button, [role="button"], label[for] {
+a, button {
   cursor: pointer;
 }
 
-/* Instrument Serif — editorial italic headlines */
 .italic {
   font-family: 'Instrument Serif', 'Georgia', serif;
   font-style: italic;
 }
 
-/* Selection */
 ::selection {
   background: #1a1a1a;
   color: #f0ede8;
 }
 
-/* No scrollbar */
-::-webkit-scrollbar { display: none; }
+::-webkit-scrollbar {
+  display: none;
+}
 
-/* Focus — keyboard nav */
 a:focus-visible,
 button:focus-visible {
   outline: 1px solid #1a1a1a;
   outline-offset: 3px;
 }
 
-/* ─── Keyframes ─────────────────────────────────────────────────── */
-
-/* Clip wipe — text reveals left to right                            */
-/* GPU composited — only animates clip-path, no layout/paint        */
 @keyframes clipReveal {
   from { clip-path: inset(0 100% -20% 0); }
   to   { clip-path: inset(0 0% -20% 0); }
 }
 
-/* Slide up + fade — content entrances */
 @keyframes slideUp {
   from { opacity: 0; transform: translateY(18px); }
   to   { opacity: 1; transform: translateY(0); }
 }
 
-/* Fade in — overlays, images */
 @keyframes fadeIn {
   from { opacity: 0; }
   to   { opacity: 1; }
 }
 
-/* Menu slide down — overlay entrance */
 @keyframes menuIn {
   from { opacity: 0; transform: translateY(-8px); }
   to   { opacity: 1; transform: translateY(0); }
 }
 
-/* Menu slide up — overlay exit */
-@keyframes menuOut {
-  from { opacity: 1; transform: translateY(0); }
-  to   { opacity: 0; transform: translateY(-6px); }
-}
-
-/* Page content transition out — project navigation */
-@keyframes contentOut {
-  from { opacity: 1; transform: translateY(0); }
-  to   { opacity: 0; transform: translateY(10px); }
-}
-
-/* Page content transition in — project navigation */
 @keyframes contentIn {
   from { opacity: 0; transform: translateY(12px); }
   to   { opacity: 1; transform: translateY(0); }
 }
 
-/* Scale in — cinematic image zoom on load */
 @keyframes scaleIn {
   from { transform: scale(1.05); }
   to   { transform: scale(1); }
 }
 
-/* Scale in fast — hover preview images */
 @keyframes scaleInFast {
   from { transform: scale(1.04); }
   to   { transform: scale(1); }
 }
 
-/* ─── Animation classes ─────────────────────────────────────────── */
-
 .animate-clip-reveal {
   animation: clipReveal 0.8s cubic-bezier(0.16, 1, 0.3, 1) both;
-  will-change: clip-path;
 }
 
 .animate-scale-in {
   animation: scaleIn 1.8s cubic-bezier(0.16, 1, 0.3, 1) both;
-  will-change: transform;
 }
 
 .animate-scale-in-fast {
   animation: scaleInFast 0.9s cubic-bezier(0.16, 1, 0.3, 1) both;
-  will-change: transform;
 }
 
-/* ─── Scroll-reveal ─────────────────────────────────────────────── */
-/* JS adds .is-visible via IntersectionObserver — fires once        */
+.animate-menu-in {
+  animation: menuIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.animate-content-in {
+  animation: contentIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
 
 .reveal {
   opacity: 0;
   transform: translateY(14px);
   transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1),
               transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
-  will-change: opacity, transform;
 }
 
 .reveal.is-visible {
@@ -131,7 +102,6 @@ button:focus-visible {
   transform: translateY(0);
 }
 
-/* CSS stagger for siblings inside .reveal-group */
 .reveal-group > .reveal:nth-child(1) { transition-delay: 0s; }
 .reveal-group > .reveal:nth-child(2) { transition-delay: 0.09s; }
 .reveal-group > .reveal:nth-child(3) { transition-delay: 0.18s; }
@@ -139,15 +109,13 @@ button:focus-visible {
 .reveal-group > .reveal:nth-child(5) { transition-delay: 0.36s; }
 .reveal-group > .reveal:nth-child(6) { transition-delay: 0.45s; }
 
-/* Gallery image hover */
 .gallery-img {
   transition: transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
 }
+
 .gallery-img:hover {
   transform: scale(1.02);
 }
-
-/* ─── Accessibility ─────────────────────────────────────────────── */
 
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
@@ -155,5 +123,8 @@ button:focus-visible {
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
   }
-  .reveal { opacity: 1; transform: none; }
+  .reveal {
+    opacity: 1;
+    transform: none;
+  }
 }

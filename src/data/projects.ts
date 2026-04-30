@@ -11,8 +11,6 @@ export interface Project {
   results: string[];
   gallery: string[];
   tags: string[];
-  nextProject: string;
-  prevProject: string;
 }
 
 export const projects: Project[] = [
@@ -37,8 +35,6 @@ export const projects: Project[] = [
       'https://images.unsplash.com/photo-1466611653911-95081537e5b7?w=1200&q=80',
     ],
     tags: ['Brand Identity', 'Type System', 'Environmental', 'Guidelines'],
-    nextProject: 'kin',
-    prevProject: 'havn',
   },
   {
     slug: 'kin',
@@ -61,8 +57,6 @@ export const projects: Project[] = [
       'https://images.unsplash.com/photo-1614935151651-0bea6508db6b?w=1200&q=80',
     ],
     tags: ['Product Design', 'Design System', 'iOS & Android', 'Data Visualisation'],
-    nextProject: 'conductor',
-    prevProject: 'solaris',
   },
   {
     slug: 'conductor',
@@ -85,8 +79,6 @@ export const projects: Project[] = [
       'https://images.unsplash.com/photo-1544197150-b99a580bb7a8?w=1200&q=80',
     ],
     tags: ['Brand Identity', 'Web Design', 'Copywriting', 'Development'],
-    nextProject: 'havn',
-    prevProject: 'kin',
   },
   {
     slug: 'havn',
@@ -109,10 +101,16 @@ export const projects: Project[] = [
       'https://images.unsplash.com/photo-1505118380757-91f5f5632de0?w=1200&q=80',
     ],
     tags: ['Brand Identity', 'Custom Type', 'Environmental', 'Maritime'],
-    nextProject: 'solaris',
-    prevProject: 'conductor',
   },
 ];
 
-export const getProjectBySlug = (slug: string): Project | undefined =>
-  projects.find(p => p.slug === slug);
+export const getProjectBySlug = (slug: string) => projects.find(p => p.slug === slug);
+
+export const getAdjacentProjects = (slug: string) => {
+  const idx = projects.findIndex(p => p.slug === slug);
+  if (idx === -1) return { prev: undefined, next: undefined };
+  return {
+    prev: projects[(idx - 1 + projects.length) % projects.length],
+    next: projects[(idx + 1) % projects.length],
+  };
+};
