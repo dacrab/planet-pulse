@@ -9,23 +9,13 @@ export function formatTimestamp(timestamp: number): string {
   return date.toLocaleDateString();
 }
 
-export function formatNumber(num: number, decimals = 2): string {
-  return num.toFixed(decimals);
-}
-
-export function formatCoordinates(lat: number, lon: number): string {
-  const latDir = lat >= 0 ? 'N' : 'S';
-  const lonDir = lon >= 0 ? 'E' : 'W';
-  return `${Math.abs(lat).toFixed(2)}°${latDir}, ${Math.abs(lon).toFixed(2)}°${lonDir}`;
-}
-
 export function calculateDistance(
   lat1: number,
   lon1: number,
   lat2: number,
   lon2: number
 ): number {
-  const R = 6371; // Earth's radius in km
+  const R = 6371;
   const dLat = ((lat2 - lat1) * Math.PI) / 180;
   const dLon = ((lon2 - lon1) * Math.PI) / 180;
   const a =
@@ -36,4 +26,22 @@ export function calculateDistance(
       Math.sin(dLon / 2);
   const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
   return R * c;
+}
+
+export function getRecentEvents<T extends { timestamp: number }>(events: T[], minutes: number): T[] {
+  const threshold = Date.now() - minutes * 60 * 1000;
+  return events.filter(e => e.timestamp > threshold);
+}
+
+import { Event, EarthquakeEvent, CryptoEvent } from '../types/events';
+
+export function calculateEventScore(event: Event): number {
+  if (event.source === 'earthquake') {
+    return Math.min(100, (event as EarthquakeEvent).magnitude * 15);
+  }
+  if (event.source === 'crypto') {
+    return Math.min(100, Math.abs((event as CryptoEvent).change_24h) * 10);
+  }
+  if (event.source === 'news') return 30;
+  return 20;
 }

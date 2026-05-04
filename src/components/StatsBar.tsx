@@ -1,6 +1,6 @@
-import { Component, For } from 'solid-js';
+import { Component, Index } from 'solid-js';
 import { useStore } from '../stores/context';
-import { eventColors } from '../design-tokens';
+import { eventColors } from '../utils/colors';
 
 export const StatsBar: Component = () => {
   const store = useStore();
@@ -10,34 +10,25 @@ export const StatsBar: Component = () => {
     const s = stats();
     return [
       { label: 'Earthquakes', count: s.bySource.earthquake, color: eventColors.earthquake },
-      { label: 'Flights', count: s.bySource.flight, color: eventColors.flight },
-      { label: 'ISS', count: s.bySource.iss, color: eventColors.iss },
+      { label: 'News', count: s.bySource.news, color: eventColors.news },
+      { label: 'Space', count: s.bySource.space, color: eventColors.space },
       { label: 'Weather', count: s.bySource.weather, color: eventColors.weather },
       { label: 'Crypto', count: s.bySource.crypto, color: eventColors.crypto },
-      { label: 'GitHub', count: s.bySource.github, color: eventColors.github },
+      { label: 'Sports', count: s.bySource.sports, color: eventColors.sports },
     ];
   };
 
   return (
-    <div class="stats-bar-compact">
-      <div class="stat-total">
-        <span class="stat-total-value">{stats().total}</span>
-        <span class="stat-total-label">Events</span>
-      </div>
-      
-      <div class="stat-divider" />
-      
-      <div class="stat-sources">
-        <For each={sourceData()}>
-          {(item) => (
-            <div class={`stat-source event-${item.color}`}>
-              <div class="event-dot" />
-              <span class="stat-source-count">{item.count}</span>
-              <span class="stat-source-label">{item.label}</span>
-            </div>
-          )}
-        </For>
-      </div>
+    <div class="flex items-center gap-6 px-6 py-4 bg-card border border-border rounded-xl overflow-x-auto">
+      <Index each={sourceData()}>
+        {(item) => (
+          <div class="flex items-center gap-2 whitespace-nowrap">
+            <div class={`w-2 h-2 rounded-full ${item().color.bg}`} />
+            <span class={`text-lg font-semibold tabular-nums ${item().color.text}`}>{item().count}</span>
+            <span class="text-xs text-content-muted">{item().label}</span>
+          </div>
+        )}
+      </Index>
     </div>
   );
 };

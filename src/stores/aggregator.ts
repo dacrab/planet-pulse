@@ -5,26 +5,26 @@ import { FilterState, EventStats } from '../types/store';
 
 export function createEventAggregator(
   earthquakes: Accessor<Event[]>,
-  flights: Accessor<Event[]>,
-  iss: Accessor<Event[]>,
+  news: Accessor<Event[]>,
+  space: Accessor<Event[]>,
   weather: Accessor<Event[]>,
   crypto: Accessor<Event[]>,
-  github: Accessor<Event[]>
+  sports: Accessor<Event[]>
 ) {
   const [filters, setFilters] = createStore<FilterState>({
-    sources: new Set<EventSource>(['earthquake', 'flight', 'iss', 'weather', 'crypto', 'github']),
-    timeRange: 60, // minutes
+    sources: new Set<EventSource>(['earthquake', 'news', 'space', 'weather', 'crypto', 'sports']),
+    timeRange: 720,
     searchQuery: '',
   });
 
   const allEvents = createMemo(() => {
     return [
       ...earthquakes(),
-      ...flights(),
-      ...iss(),
+      ...news(),
+      ...space(),
       ...weather(),
       ...crypto(),
-      ...github(),
+      ...sports(),
     ].sort((a, b) => b.timestamp - a.timestamp);
   });
 
@@ -48,11 +48,11 @@ export function createEventAggregator(
     const events = filteredEvents();
     const bySource: Record<EventSource, number> = {
       earthquake: 0,
-      flight: 0,
-      iss: 0,
+      news: 0,
+      space: 0,
       weather: 0,
       crypto: 0,
-      github: 0,
+      sports: 0,
     };
 
     events.forEach((event) => {

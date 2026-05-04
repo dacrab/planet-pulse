@@ -1,6 +1,6 @@
 import { API_CONFIG } from '../config/api';
 import { EarthquakeEvent } from '../types/events';
-import { fetchWithTimeout, APIError } from './base';
+import { fetchWithTimeout } from './base';
 
 interface USGSFeature {
   id: string;
@@ -30,10 +30,6 @@ export async function fetchEarthquakes(): Promise<EarthquakeEvent[]> {
       lon: feature.geometry.coordinates[0],
     }));
   } catch (error) {
-    throw new APIError(
-      error instanceof Error ? error.message : 'Failed to fetch earthquakes',
-      undefined,
-      'earthquake'
-    );
+    throw new Error(error instanceof Error ? error.message : 'Failed to fetch earthquakes');
   }
 }

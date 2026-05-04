@@ -1,94 +1,49 @@
-import { Component, For, createSignal, onMount } from 'solid-js';
+import { Component, Index, lazy } from 'solid-js';
 import { useStore } from '../stores/context';
 import { EventFeed } from './EventFeed';
 import { StatsBar } from './StatsBar';
 import { FilterPanel } from './FilterPanel';
 import { AlertsPanel } from './AlertsPanel';
-import { InsightsPanel } from './InsightsPanel';
-import { CorrelationsPanel } from './CorrelationsPanel';
+
+const InsightsPanel = lazy(() => import('./InsightsPanel').then(m => ({ default: m.InsightsPanel })));
+const CorrelationsPanel = lazy(() => import('./CorrelationsPanel').then(m => ({ default: m.CorrelationsPanel })));
+const AchievementsPanel = lazy(() => import('./AchievementsPanel').then(m => ({ default: m.AchievementsPanel })));
 
 export const Dashboard: Component = () => {
   const store = useStore();
-  const [time, setTime] = createSignal('');
-
-  onMount(() => {
-    const update = () => setTime(new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit' }));
-    update();
-    const interval = setInterval(update, 1000);
-    return () => clearInterval(interval);
-  });
 
   return (
-    <div class="dashboard">
-      <header class="dashboard-header">
-        <div class="dashboard-header-content">
+    <div class="min-h-screen bg-page text-content">
+      <header class="h-16 border-b border-border bg-card/80 backdrop-blur-md sticky top-0 z-50 flex items-center px-6">
+        <div class="max-w-[1800px] w-full mx-auto flex items-center justify-between">
           <div>
-            <h1 class="dashboard-title">🌍 Planet Pulse</h1>
-            <p class="dashboard-subtitle">Real-time intelligence · Cross-source correlations</p>
+            <h1 class="text-xl font-semibold tracking-tight leading-tight">Planet Pulse</h1>
+            <p class="text-xs text-content-muted tracking-wide mt-1 hidden sm:block">Real-time intelligence · Cross-source correlations</p>
           </div>
-          <div style="display: flex; align-items: center; gap: 2rem;">
-            <div style="text-align: right;">
-              <div class="status-label">Live</div>
-              <div style="font-size: 1.125rem; font-weight: 600; font-variant-numeric: tabular-nums; color: var(--text-primary);">{time()}</div>
-            </div>
-            <ConnectionStatus />
+          <div class="flex items-center gap-2 text-xs font-medium text-content-subtle">
+            <div class="w-2 h-2 rounded-full bg-success animate-[pulse_1.5s_ease-in-out_infinite]" />
+            <span>LIVE</span>
           </div>
         </div>
       </header>
 
-      <main class="dashboard-main">
+      <main class="p-6 max-w-[1800px] mx-auto space-y-6">
         <StatsBar />
         
-        <div style="margin-bottom: var(--space-lg);">
-          <AlertsPanel />
-        </div>
+        <AlertsPanel />
 
-        <div class="dashboard-layout">
+        <div class="grid grid-cols-1 lg:grid-cols-[240px_1fr_320px] gap-6">
           <FilterPanel />
 
           <EventFeed />
 
-          <div class="dashboard-sidebar-right">
+          <div class="flex flex-col gap-6">
             <InsightsPanel />
             <CorrelationsPanel />
+            <AchievementsPanel />
           </div>
         </div>
       </main>
-    </div>
-  );
-};
-
-const ConnectionStatus: Component = () => {
-  const store = useStore();
-  
-  const sources = [
-    { name: 'Earthquake', store: store.earthquakeStore },
-    { name: 'Flights', store: store.flightStore },
-    { name: 'ISS', store: store.issStore },
-    { name: 'Weather', store: store.weatherStore },
-    { name: 'Crypto', store: store.cryptoStore },
-    { name: 'GitHub', store: store.githubStore },
-  ];
-
-  return (
-    <div class="status-group">
-      <div class="status-label">Status</div>
-      <div class="status-dots">
-        <For each={sources}>
-          {(src) => (
-            <div 
-              class="status-dot"
-              classList={{
-                'active': !src.store.loading() && !src.store.error(),
-                'loading': src.store.loading(),
-                'error': !!src.store.error(),
-              }}
-              title={src.name}
-              aria-label={`${src.name}: ${src.store.error() ? 'error' : src.store.loading() ? 'loading' : 'connected'}`}
-            />
-          )}
-        </For>
-      </div>
     </div>
   );
 };

@@ -1,59 +1,59 @@
-import { For, Show } from 'solid-js';
+import { Index, Show } from 'solid-js';
 import { useStore } from '../stores/context';
 
 export function CorrelationsPanel() {
   const store = useStore();
-  const correlations = () => store.intelligence.geographicCorrelations();
+  const correlations = () => store.intelligence.geoCorrelations();
 
   return (
-    <div class="correlations-panel">
-      <h3 style="font-size: 0.875rem; font-weight: 600; color: var(--text-primary); margin-bottom: 1rem;">
-        🔗 Correlations
+    <div class="p-6 rounded-xl border border-border bg-card">
+      <h3 class="text-sm font-semibold text-content mb-4">
+        Correlations
       </h3>
       
       <Show 
         when={correlations().length > 0}
         fallback={
-          <div style="text-align: center; padding: 2rem 1rem; color: var(--text-tertiary); font-size: 0.8125rem;">
+          <div class="text-center py-8 text-sm text-content-subtle">
             No cross-source patterns detected
           </div>
         }
       >
-        <div style="display: flex; flex-direction: column; gap: 0.875rem;">
-          <For each={correlations()}>
+        <div class="flex flex-col gap-4">
+          <Index each={correlations()}>
             {(correlation) => (
-              <div class="correlation-card">
-                <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 0.625rem;">
-                  <div style="flex: 1;">
-                    <div style="font-size: 0.6875rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--accent-primary); font-weight: 600; margin-bottom: 0.25rem;">
-                      {correlation.type}
+              <div class="p-4 rounded-lg bg-sidebar border border-border">
+                <div class="flex justify-between items-start mb-3">
+                  <div class="flex-1">
+                    <div class="text-[0.6875rem] uppercase tracking-wider text-accent font-semibold mb-1">
+                      {correlation().type}
                     </div>
-                    <p style="font-size: 0.8125rem; line-height: 1.5; color: var(--text-secondary);">
-                      {correlation.description}
+                    <p class="text-sm leading-relaxed text-content-muted">
+                      {correlation().description}
                     </p>
                   </div>
-                  <div style="text-align: right; margin-left: 0.75rem;">
-                    <div style="font-size: 0.6875rem; color: var(--text-tertiary); margin-bottom: 0.125rem;">
+                  <div class="text-right ml-3 shrink-0">
+                    <div class="text-[0.6875rem] text-content-subtle mb-0.5">
                       Impact
                     </div>
-                    <div style="font-size: 1.25rem; font-weight: 700; color: var(--accent-primary);">
-                      {Math.round(correlation.significance)}
+                    <div class="text-xl font-bold text-accent">
+                      {Math.round(correlation().significance)}
                     </div>
                   </div>
                 </div>
                 
-                <div style="display: flex; flex-wrap: wrap; gap: 0.375rem;">
-                  <For each={correlation.events}>
+                <div class="flex flex-wrap gap-1.5">
+                  <Index each={correlation().events}>
                     {(event) => (
-                      <span style="font-size: 0.6875rem; padding: 0.25rem 0.5rem; background: var(--bg-sidebar); border-radius: 4px; color: var(--text-tertiary);">
-                        {event.source}
+                      <span class="text-[0.6875rem] px-2 py-1 bg-border/50 rounded text-content-subtle capitalize">
+                        {event().source}
                       </span>
                     )}
-                  </For>
+                  </Index>
                 </div>
               </div>
             )}
-          </For>
+          </Index>
         </div>
       </Show>
     </div>

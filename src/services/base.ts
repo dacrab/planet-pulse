@@ -1,14 +1,3 @@
-export class APIError extends Error {
-  constructor(
-    message: string,
-    public status?: number,
-    public source?: string
-  ) {
-    super(message);
-    this.name = 'APIError';
-  }
-}
-
 export async function fetchWithTimeout(
   url: string,
   options: RequestInit = {},
@@ -25,19 +14,15 @@ export async function fetchWithTimeout(
     clearTimeout(id);
 
     if (!response.ok) {
-      throw new APIError(
-        `HTTP ${response.status}: ${response.statusText}`,
-        response.status
-      );
+      throw new Error(`HTTP ${response.status}: ${response.statusText}`);
     }
 
     return response;
   } catch (error) {
     clearTimeout(id);
-    if (error instanceof APIError) throw error;
     if (error instanceof Error && error.name === 'AbortError') {
-      throw new APIError('Request timeout');
+      throw new Error('Request timeout');
     }
-    throw new APIError(error instanceof Error ? error.message : 'Unknown error');
+    throw error instanceof Error ? error : new Error('Unknown error');
   }
 }

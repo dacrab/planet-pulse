@@ -1,5 +1,11 @@
-import { For, Show } from 'solid-js';
+import { Index, Show } from 'solid-js';
 import { useStore } from '../stores/context';
+
+const alertStyles = {
+  action: 'border-l-4 border-l-danger bg-danger/5 border-border',
+  watch: 'border-l-4 border-l-warning bg-warning/5 border-border',
+  fyi: 'border-l-4 border-l-info bg-info/5 border-border',
+};
 
 export function AlertsPanel() {
   const store = useStore();
@@ -7,34 +13,27 @@ export function AlertsPanel() {
 
   return (
     <Show when={alerts().length > 0}>
-      <div style="display: flex; flex-direction: column; gap: 0.75rem;">
-        <For each={alerts()}>
+      <div class="flex flex-col gap-3">
+        <Index each={alerts()}>
           {(alert) => (
-            <div 
-              class="alert-card"
-              classList={{
-                'alert-action': alert.tier === 'action',
-                'alert-watch': alert.tier === 'watch',
-                'alert-fyi': alert.tier === 'fyi',
-              }}
-            >
-              <div style="display: flex; justify-content: space-between; align-items: start; gap: 1rem;">
-                <div style="flex: 1;">
-                  <div style="font-weight: 600; font-size: 0.875rem; margin-bottom: 0.375rem;">
-                    {alert.title}
+            <div class={`p-4 rounded-lg border transition-all ${alertStyles[alert().tier]}`}>
+              <div class="flex justify-between items-start gap-4">
+                <div class="flex-1">
+                  <div class="font-semibold text-sm mb-1 text-content">
+                    {alert().title}
                   </div>
-                  <div style="font-size: 0.8125rem; color: var(--text-secondary); line-height: 1.5;">
-                    {alert.message}
+                  <div class="text-sm text-content-muted leading-relaxed">
+                    {alert().message}
                   </div>
-                  <Show when={alert.events.length > 0}>
-                    <div style="margin-top: 0.625rem; font-size: 0.75rem; color: var(--text-tertiary);">
-                      📍 {alert.events.length} related event{alert.events.length > 1 ? 's' : ''}
+                  <Show when={alert().events.length > 0}>
+                    <div class="mt-2 text-xs text-content-subtle">
+                      {alert().events.length} related event{alert().events.length > 1 ? 's' : ''}
                     </div>
                   </Show>
                 </div>
                 <button
-                  class="alert-dismiss"
-                  onClick={() => store.intelligence.dismissAlert(alert.id)}
+                  class="text-content-subtle hover:text-content transition-colors p-1"
+                  onClick={() => store.intelligence.dismissAlert(alert().id)}
                   aria-label="Dismiss alert"
                 >
                   ✕
@@ -42,7 +41,7 @@ export function AlertsPanel() {
               </div>
             </div>
           )}
-        </For>
+        </Index>
       </div>
     </Show>
   );

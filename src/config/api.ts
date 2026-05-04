@@ -1,34 +1,26 @@
 export const API_CONFIG = {
   earthquake: {
     url: 'https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_hour.geojson',
-    interval: 60000, // 60s
+    interval: 60000,
   },
-  flight: {
-    url: 'https://opensky-network.org/api/states/all',
-    interval: 30000, // 30s
-    limit: 100, // requests per day
+  news: {
+    url: 'https://www.reddit.com/r/worldnews/top.json?limit=20',
+    interval: 300000,
   },
-  iss: {
-    url: 'http://api.open-notify.org/iss-now.json',
-    interval: 10000, // 10s
+  crypto: {
+    url: 'https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=20&sparkline=false',
+    interval: 60000,
   },
   weather: {
     url: 'https://api.open-meteo.com/v1/forecast',
-    interval: 300000, // 300s
+    interval: 300000,
   },
-  crypto: {
-    wsUrl: 'wss://stream.binance.com:9443/ws/!ticker@arr',
+  sports: {
+    url: 'https://www.thesportsdb.com/api/v1/json/3/eventsday.php',
+    interval: 300000,
   },
-  github: {
-    url: 'https://api.github.com/events',
-    interval: 60000, // 60s
-    limit: 60, // requests per hour
+  space: {
+    url: 'http://api.open-notify.org/iss-now.json',
+    interval: 10000,
   },
 } as const;
-
-export const MAP_CONFIG = {
-  center: [0, 0] as [number, number],
-  zoom: 2,
-  maxZoom: 18,
-  minZoom: 1,
-};

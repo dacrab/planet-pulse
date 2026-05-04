@@ -1,13 +1,11 @@
 import { createMemo, Accessor } from 'solid-js';
-import { Event, EarthquakeEvent, CryptoEvent, FlightEvent } from '../types/events';
+import { Event, EarthquakeEvent, CryptoEvent, NewsEvent } from '../types/events';
+import { getRecentEvents, calculateEventScore } from '../utils/formatters';
 
 export function createInsightsStore(allEvents: Accessor<Event[]>) {
   
-  const whatsHappeningNow = createMemo(() => {
-    const events = allEvents();
-    const recentThreshold = Date.now() - 15 * 60 * 1000; // 15 min
-    const recent = events.filter(e => e.timestamp > recentThreshold);
-
+  const statusSummary = createMemo(() => {
+    const recent = getRecentEvents(allEvents(), 15);
     if (recent.length === 0) return "Quiet period - monitoring all sources...";
 
     const bySource = recent.reduce((acc, e) => {
@@ -23,96 +21,58 @@ export function createInsightsStore(allEvents: Accessor<Event[]>) {
       parts.push(`${bySource.earthquake} earthquake${bySource.earthquake > 1 ? 's' : ''} (max M${maxMag.toFixed(1)})`);
     }
     
-    if (bySource.flight) {
-      parts.push(`${bySource.flight} flights tracked`);
-    }
+    if (bySource.flight) parts.push(`${bySource.flight} news articles`);
     
     if (bySource.crypto) {
       const cryptos = recent.filter(e => e.source === 'crypto') as CryptoEvent[];
       const volatile = cryptos.filter(c => Math.abs(c.change_24h) > 3).length;
-      if (volatile > 0) {
-        parts.push(`${volatile} volatile crypto assets`);
-      } else {
-        parts.push(`${bySource.crypto} crypto updates`);
-      }
+      parts.push(volatile > 0 ? `${volatile} volatile crypto assets` : `${bySource.crypto} crypto updates`);
     }
 
-    if (bySource.github) {
-      parts.push(`${bySource.github} GitHub events`);
-    }
+    if (bySource.github) parts.push(`${bySource.github} GitHub events`);
 
     return parts.length > 0 ? parts.join(' • ') : "Monitoring global activity...";
   });
 
   const topEvent = createMemo(() => {
-    const events = allEvents();
-    const recentThreshold = Date.now() - 60 * 60 * 1000; // 1 hour
-    const recent = events.filter(e => e.timestamp > recentThreshold);
-
+    const recent = getRecentEvents(allEvents(), 60);
     if (recent.length === 0) return null;
 
-    // Find most significant event
-    let topEvent: Event | null = null;
-    let topScore = 0;
-
-    recent.forEach(event => {
-      let score = 0;
-      
-      if (event.source === 'earthquake') {
-        const eq = event as EarthquakeEvent;
-        score = eq.magnitude * 15;
-      } else if (event.source === 'crypto') {
-        const crypto = event as CryptoEvent;
-        score = Math.abs(crypto.change_24h) * 8;
-      } else if (event.source === 'flight') {
-        const flight = event as FlightEvent;
-        score = flight.velocity > 800 ? 40 : 20;
-      }
-
-      if (score > topScore) {
-        topScore = score;
-        topEvent = event;
-      }
-    });
-
-    if (!topEvent) return null;
+    const scored = recent.map(event => ({ event, score: calculateEventScore(event) }));
+    const best = scored.reduce((max, curr) => curr.score > max.score ? curr : max, scored[0]);
+    
+    if (!best || best.score === 0) return null;
 
     let description = '';
-    if (topEvent.source === 'earthquake') {
-      const eq = topEvent as EarthquakeEvent;
+    const { event } = best;
+    
+    if (event.source === 'earthquake') {
+      const eq = event as EarthquakeEvent;
       description = `M${eq.magnitude} earthquake in ${eq.place}`;
-    } else if (topEvent.source === 'crypto') {
-      const crypto = topEvent as CryptoEvent;
-      const direction = crypto.change_24h > 0 ? 'up' : 'down';
-      description = `${crypto.symbol} ${direction} ${Math.abs(crypto.change_24h).toFixed(1)}% in 24h`;
-    } else if (topEvent.source === 'flight') {
-      const flight = topEvent as FlightEvent;
-      description = `${flight.callsign} flying at ${flight.velocity.toFixed(0)} km/h`;
+    } else if (event.source === 'crypto') {
+      const crypto = event as CryptoEvent;
+      const dir = crypto.change_24h > 0 ? 'up' : 'down';
+      description = `${crypto.symbol} ${dir} ${Math.abs(crypto.change_24h).toFixed(1)}% in 24h`;
+    } else if (event.source === 'news') {
+      description = (event as NewsEvent).title;
     }
 
-    return { event: topEvent, description, score: topScore };
+    return { event, description, score: best.score };
   });
 
-  const activityTrend = createMemo(() => {
-    const events = allEvents();
+  const trend = createMemo(() => {
     const now = Date.now();
-    const last15min = events.filter(e => e.timestamp > now - 15 * 60 * 1000).length;
-    const prev15min = events.filter(e => 
-      e.timestamp > now - 30 * 60 * 1000 && e.timestamp <= now - 15 * 60 * 1000
-    ).length;
+    const last15 = allEvents().filter(e => e.timestamp > now - 15 * 60 * 1000).length;
+    const prev15 = allEvents().filter(e => e.timestamp > now - 30 * 60 * 1000 && e.timestamp <= now - 15 * 60 * 1000).length;
 
-    if (prev15min === 0) return { trend: 'stable', change: 0 };
+    if (prev15 === 0) return { trend: 'stable', change: 0 };
 
-    const change = ((last15min - prev15min) / prev15min) * 100;
+    const change = ((last15 - prev15) / prev15) * 100;
     
     if (change > 20) return { trend: 'increasing', change };
     if (change < -20) return { trend: 'decreasing', change };
     return { trend: 'stable', change };
   });
 
-  return {
-    whatsHappeningNow,
-    topEvent,
-    activityTrend,
-  };
+  return { statusSummary, topEvent, trend };
 }

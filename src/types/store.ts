@@ -13,11 +13,6 @@ export interface PollingStore<T> extends StoreState<T> {
   unsubscribe: () => void;
 }
 
-export interface WebSocketStore<T> extends StoreState<T> {
-  connect: () => void;
-  disconnect: () => void;
-}
-
 export interface FilterState {
   sources: Set<EventSource>;
   timeRange: number; // minutes

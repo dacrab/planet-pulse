@@ -6,62 +6,51 @@ export function InsightsPanel() {
   const insights = store.insights;
 
   return (
-    <div class="insights-panel">
-      <h3 style="font-size: 0.875rem; font-weight: 600; color: var(--text-primary); margin-bottom: 1rem;">
-        🧠 Intelligence
+    <div class="p-6 rounded-xl border border-border bg-card">
+      <h3 class="text-sm font-semibold text-content mb-4">
+        Intelligence
       </h3>
 
-      <div style="display: flex; flex-direction: column; gap: 0.875rem;">
-        {/* What's Happening */}
-        <div class="insight-card" style="border-left: 3px solid var(--accent-primary);">
-          <div style="font-size: 0.6875rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--accent-primary); margin-bottom: 0.5rem; font-weight: 600;">
-            Right Now
-          </div>
-          <p style="font-size: 0.8125rem; line-height: 1.5; color: var(--text-secondary);">
-            {insights.whatsHappeningNow()}
-          </p>
-        </div>
-
-        {/* Activity Trend */}
-        <div class="insight-card">
-          <div style="font-size: 0.6875rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-tertiary); margin-bottom: 0.5rem; font-weight: 600;">
+      <div class="flex flex-col gap-4">
+        <div class="p-4 rounded-lg bg-sidebar border border-border">
+          <div class="text-[0.6875rem] uppercase tracking-wider text-content-subtle mb-2 font-semibold">
             Trend
           </div>
-          <div style="display: flex; align-items: center; gap: 0.625rem;">
-            <span style="font-size: 1.5rem;">
-              {insights.activityTrend().trend === 'increasing' ? '📈' : 
-               insights.activityTrend().trend === 'decreasing' ? '📉' : '➡️'}
+          <div class="flex items-center gap-3">
+            <span class="text-2xl">
+              {insights.trend().trend === 'increasing' ? '📈' : 
+               insights.trend().trend === 'decreasing' ? '📉' : '➡️'}
             </span>
             <div>
-              <div style="font-size: 0.875rem; font-weight: 500; color: var(--text-primary);">
-                {insights.activityTrend().trend === 'stable' ? 'Stable' :
-                 insights.activityTrend().trend === 'increasing' ? 'Rising' : 'Declining'}
+              <div class="text-sm font-medium text-content">
+                {insights.trend().trend === 'stable' ? 'Stable' :
+                 insights.trend().trend === 'increasing' ? 'Rising' : 'Declining'}
               </div>
-              <div style="font-size: 0.75rem; color: var(--text-tertiary);">
-                {Math.abs(insights.activityTrend().change).toFixed(0)}% vs 15min ago
+              <div class="text-xs text-content-subtle mt-0.5">
+                {Math.abs(insights.trend().change).toFixed(0)}% vs 15min ago
               </div>
             </div>
           </div>
         </div>
 
-        {/* Top Event */}
         <Show when={insights.topEvent()}>
           {(top) => (
-            <div class="insight-card" style="border-left: 3px solid var(--warning);">
-              <div style="font-size: 0.6875rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--warning); margin-bottom: 0.5rem; font-weight: 600;">
+            <div class="p-4 rounded-lg bg-sidebar border border-border border-l-4 border-l-warning">
+              <div class="text-[0.6875rem] uppercase tracking-wider text-warning mb-2 font-semibold">
                 Event of the Hour
               </div>
-              <p style="font-size: 0.8125rem; line-height: 1.5; color: var(--text-secondary); margin-bottom: 0.625rem;">
+              <p class="text-sm leading-relaxed text-content-muted mb-3">
                 {top().description}
               </p>
-              <div style="display: flex; align-items: center; gap: 0.5rem;">
-                <span style="font-size: 0.6875rem; color: var(--text-tertiary);">Impact:</span>
-                <div style="flex: 1; height: 4px; background: var(--bg-sidebar); border-radius: 2px; overflow: hidden;">
+              <div class="flex items-center gap-2">
+                <span class="text-[0.6875rem] text-content-subtle">Impact:</span>
+                <div class="flex-1 h-1 bg-border rounded-full overflow-hidden">
                   <div 
-                    style={`width: ${Math.min(100, top().score)}%; height: 100%; background: linear-gradient(90deg, var(--warning), var(--danger)); transition: width 0.3s ease;`}
+                    class="h-full bg-gradient-to-r from-warning to-danger transition-all duration-300"
+                    style={`width: ${Math.min(100, top().score)}%`}
                   />
                 </div>
-                <span style="font-size: 0.75rem; font-weight: 600; color: var(--text-primary);">
+                <span class="text-xs font-semibold text-content">
                   {Math.round(top().score)}
                 </span>
               </div>

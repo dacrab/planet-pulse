@@ -1,4 +1,4 @@
-export type EventSource = 'earthquake' | 'flight' | 'iss' | 'weather' | 'crypto' | 'github';
+export type EventSource = 'earthquake' | 'news' | 'space' | 'weather' | 'crypto' | 'sports';
 
 export interface BaseEvent {
   id: string;
@@ -17,18 +17,17 @@ export interface EarthquakeEvent extends BaseEvent {
   lon: number;
 }
 
-export interface FlightEvent extends BaseEvent {
-  source: 'flight';
-  callsign: string;
-  origin_country: string;
-  velocity: number;
-  altitude: number;
-  lat: number;
-  lon: number;
+export interface NewsEvent extends BaseEvent {
+  source: 'news';
+  title: string;
+  description: string;
+  url: string;
+  source_name: string;
+  image?: string;
 }
 
-export interface ISSEvent extends BaseEvent {
-  source: 'iss';
+export interface SpaceEvent extends BaseEvent {
+  source: 'space';
   lat: number;
   lon: number;
   altitude: number;
@@ -47,17 +46,19 @@ export interface WeatherEvent extends BaseEvent {
 export interface CryptoEvent extends BaseEvent {
   source: 'crypto';
   symbol: string;
+  name: string;
   price: number;
   change_24h: number;
-  volume: number;
+  market_cap: number;
 }
 
-export interface GitHubEvent extends BaseEvent {
-  source: 'github';
-  type: string;
-  repo: string;
-  actor: string;
-  action: string;
+export interface SportsEvent extends BaseEvent {
+  source: 'sports';
+  event_name: string;
+  home_team: string;
+  away_team: string;
+  league: string;
+  date: string;
 }
 
-export type Event = EarthquakeEvent | FlightEvent | ISSEvent | WeatherEvent | CryptoEvent | GitHubEvent;
+export type Event = EarthquakeEvent | NewsEvent | SpaceEvent | WeatherEvent | CryptoEvent | SportsEvent;

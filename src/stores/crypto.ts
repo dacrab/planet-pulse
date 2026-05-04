@@ -1,34 +1,9 @@
-import { createSignal, onCleanup } from 'solid-js';
 import { CryptoEvent } from '../types/events';
-import { WebSocketStore } from '../types/store';
-import { CryptoWebSocket } from '../services/crypto';
+import { PollingStore } from '../types/store';
+import { fetchCrypto } from '../services/crypto';
+import { API_CONFIG } from '../config/api';
+import { createPollingStore } from './polling-factory';
 
-export function createCryptoStore(): WebSocketStore<CryptoEvent> {
-  const [data, setData] = createSignal<CryptoEvent[]>([]);
-  const [loading, setLoading] = createSignal(false);
-  const [error, setError] = createSignal<string | null>(null);
-  const ws = new CryptoWebSocket();
-
-  const connect = () => {
-    setLoading(true);
-    setError(null);
-    ws.connect(
-      (events) => {
-        setData(events);
-        setLoading(false);
-      },
-      (err) => {
-        setError(err);
-        setLoading(false);
-      }
-    );
-  };
-
-  const disconnect = () => {
-    ws.disconnect();
-  };
-
-  onCleanup(disconnect);
-
-  return { data, loading, error, connect, disconnect };
+export function createCryptoStore(): PollingStore<CryptoEvent> {
+  return createPollingStore(fetchCrypto, API_CONFIG.crypto.interval);
 }

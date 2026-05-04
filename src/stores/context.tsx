@@ -1,47 +1,47 @@
 import { createContext, useContext, onMount, onCleanup, createEffect, JSX } from 'solid-js';
 import { createEarthquakeStore } from './earthquake';
-import { createFlightStore } from './flight';
-import { createISSStore } from './iss';
+import { createNewsStore } from './news';
+import { createSpaceStore } from './space';
 import { createWeatherStore } from './weather';
 import { createCryptoStore } from './crypto';
-import { createGitHubStore } from './github';
+import { createSportsStore } from './sports';
 import { createEventAggregator } from './aggregator';
 import { createIntelligenceStore } from './intelligence';
 import { createAchievementsStore } from './achievements';
 import { createInsightsStore } from './insights';
-import { useVisibility } from '../hooks';
+import { useVisibility } from '../hooks/useVisibility';
 
 export function createGlobalStore() {
   const earthquakeStore = createEarthquakeStore();
-  const flightStore = createFlightStore();
-  const issStore = createISSStore();
+  const newsStore = createNewsStore();
+  const spaceStore = createSpaceStore();
   const weatherStore = createWeatherStore();
   const cryptoStore = createCryptoStore();
-  const githubStore = createGitHubStore();
+  const sportsStore = createSportsStore();
 
   const aggregator = createEventAggregator(
     earthquakeStore.data,
-    flightStore.data,
-    issStore.data,
+    newsStore.data,
+    spaceStore.data,
     weatherStore.data,
     cryptoStore.data,
-    githubStore.data
+    sportsStore.data
   );
 
   const intelligence = createIntelligenceStore(aggregator.allEvents);
   const insights = createInsightsStore(aggregator.allEvents);
   const achievements = createAchievementsStore(
     aggregator.allEvents,
-    () => intelligence.geographicCorrelations().length
+    () => intelligence.geoCorrelations().length
   );
 
   return {
     earthquakeStore,
-    flightStore,
-    issStore,
+    newsStore,
+    spaceStore,
     weatherStore,
     cryptoStore,
-    githubStore,
+    sportsStore,
     aggregator,
     intelligence,
     insights,
@@ -57,46 +57,21 @@ export function StoreProvider(props: { children: JSX.Element }) {
   const store = createGlobalStore();
   const isVisible = useVisibility();
 
-  onMount(() => {
-    // Start all polling stores
-    store.earthquakeStore.subscribe();
-    store.flightStore.subscribe();
-    store.issStore.subscribe();
-    store.weatherStore.subscribe();
-    store.githubStore.subscribe();
-    
-    // Connect WebSocket
-    store.cryptoStore.connect();
-  });
+  const pollingStores = [
+    store.earthquakeStore,
+    store.weatherStore,
+    store.cryptoStore,
+    store.newsStore,
+    store.sportsStore,
+    store.spaceStore,
+  ];
 
-  // Pause/resume polling based on visibility
-  createEffect(() => {
-    if (!isVisible()) {
-      // Pause polling when tab is hidden
-      store.earthquakeStore.unsubscribe();
-      store.flightStore.unsubscribe();
-      store.issStore.unsubscribe();
-      store.weatherStore.unsubscribe();
-      store.githubStore.unsubscribe();
-    } else {
-      // Resume polling when tab becomes visible
-      store.earthquakeStore.subscribe();
-      store.flightStore.subscribe();
-      store.issStore.subscribe();
-      store.weatherStore.subscribe();
-      store.githubStore.subscribe();
-    }
-  });
+  const subscribeAll = () => pollingStores.forEach(s => s.subscribe());
+  const unsubscribeAll = () => pollingStores.forEach(s => s.unsubscribe());
 
-  onCleanup(() => {
-    // Clean up all stores
-    store.earthquakeStore.unsubscribe();
-    store.flightStore.unsubscribe();
-    store.issStore.unsubscribe();
-    store.weatherStore.unsubscribe();
-    store.githubStore.unsubscribe();
-    store.cryptoStore.disconnect();
-  });
+  onMount(subscribeAll);
+  createEffect(() => isVisible() ? subscribeAll() : unsubscribeAll());
+  onCleanup(unsubscribeAll);
 
   return (
     <StoreContext.Provider value={store}>

@@ -1,6 +1,6 @@
 import { API_CONFIG } from '../config/api';
 import { WeatherEvent } from '../types/events';
-import { fetchWithTimeout, APIError } from './base';
+import { fetchWithTimeout } from './base';
 
 const MAJOR_CITIES = [
   { name: 'New York', lat: 40.7128, lon: -74.0060 },
@@ -32,11 +32,7 @@ export async function fetchWeather(): Promise<WeatherEvent[]> {
 
     return events;
   } catch (error) {
-    throw new APIError(
-      error instanceof Error ? error.message : 'Failed to fetch weather',
-      undefined,
-      'weather'
-    );
+    throw new Error(error instanceof Error ? error.message : 'Failed to fetch weather');
   }
 }
 
