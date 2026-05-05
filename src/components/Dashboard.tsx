@@ -1,5 +1,4 @@
-import { Component, Index, lazy } from 'solid-js';
-import { useStore } from '../stores/context';
+import { Component, lazy } from 'solid-js';
 import { EventFeed } from './EventFeed';
 import { StatsBar } from './StatsBar';
 import { FilterPanel } from './FilterPanel';
@@ -10,34 +9,36 @@ const CorrelationsPanel = lazy(() => import('./CorrelationsPanel').then(m => ({ 
 const AchievementsPanel = lazy(() => import('./AchievementsPanel').then(m => ({ default: m.AchievementsPanel })));
 
 export const Dashboard: Component = () => {
-  const store = useStore();
-
   return (
     <div class="min-h-screen bg-page text-content">
-      <header class="h-16 border-b border-border bg-card/80 backdrop-blur-md sticky top-0 z-50 flex items-center px-6">
-        <div class="max-w-[1800px] w-full mx-auto flex items-center justify-between">
-          <div>
-            <h1 class="text-xl font-semibold tracking-tight leading-tight">Planet Pulse</h1>
-            <p class="text-xs text-content-muted tracking-wide mt-1 hidden sm:block">Real-time intelligence · Cross-source correlations</p>
+      {/* Header */}
+      <header class="h-[var(--header-h)] border-b border-border bg-surface/80 backdrop-blur-xl sticky top-0 z-50">
+        <div class="max-w-[var(--layout-max)] mx-auto h-full px-6 flex items-center justify-between">
+          <div class="flex items-center gap-3">
+            <div class="w-7 h-7 rounded-lg bg-accent/20 border border-accent/30 flex items-center justify-center">
+              <div class="w-2.5 h-2.5 rounded-full bg-accent" />
+            </div>
+            <div>
+              <span class="text-sm font-semibold tracking-tight text-content">Planet Pulse</span>
+              <span class="hidden sm:inline text-xs text-content-subtle ml-2">real-time intelligence</span>
+            </div>
           </div>
-          <div class="flex items-center gap-2 text-xs font-medium text-content-subtle">
-            <div class="w-2 h-2 rounded-full bg-success animate-[pulse_1.5s_ease-in-out_infinite]" />
-            <span>LIVE</span>
+          <div class="flex items-center gap-2">
+            <div class="w-1.5 h-1.5 rounded-full bg-success animate-[pulse_2s_ease-in-out_infinite]" />
+            <span class="text-xs font-medium text-content-subtle tracking-widest uppercase">Live</span>
           </div>
         </div>
       </header>
 
-      <main class="p-6 max-w-[1800px] mx-auto space-y-6">
+      {/* Main */}
+      <main class="max-w-[var(--layout-max)] mx-auto px-6 py-6 space-y-4">
         <StatsBar />
-        
         <AlertsPanel />
 
-        <div class="grid grid-cols-1 lg:grid-cols-[240px_1fr_320px] gap-6">
+        <div class="grid grid-cols-1 lg:grid-cols-[220px_1fr_300px] gap-4">
           <FilterPanel />
-
           <EventFeed />
-
-          <div class="flex flex-col gap-6">
+          <div class="flex flex-col gap-4">
             <InsightsPanel />
             <CorrelationsPanel />
             <AchievementsPanel />

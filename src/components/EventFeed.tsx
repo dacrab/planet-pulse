@@ -1,4 +1,4 @@
-import { Component, Index, Show, Switch, Match } from 'solid-js';
+import { Component, Index, Show } from 'solid-js';
 import { useStore } from '../stores/context';
 import { Event } from '../types/events';
 import { eventColors } from '../utils/colors';
@@ -9,22 +9,29 @@ export const EventFeed: Component = () => {
   const events = () => store.aggregator.filteredEvents();
 
   return (
-    <div class="bg-card border border-border rounded-xl flex flex-col h-fit overflow-hidden">
-      <div class="flex items-center justify-between p-4 px-6 border-b border-border">
-        <h2 class="text-base font-medium text-content-muted">Live Event Feed</h2>
-        <div class="text-sm font-semibold tabular-nums text-content-muted">{events().length}</div>
+    <div class="bg-card border border-border rounded-xl flex flex-col self-start sticky top-[var(--header-h)]">
+      <div class="flex items-center justify-between px-5 py-3.5 border-b border-border">
+        <span class="text-sm font-medium text-content">Live Feed</span>
+        <span class="text-xs tabular-nums font-semibold text-content-subtle bg-surface px-2 py-0.5 rounded-md">
+          {events().length}
+        </span>
       </div>
-      
-      <div class="max-h-[calc(100vh-400px)] overflow-y-auto">
-        <Show when={events().length > 0} fallback={
-          <div class="p-24 text-center">
-            <p class="text-sm font-medium text-content-muted mb-1">No events yet</p>
-            <p class="text-xs text-content-subtle">Events will appear here as they happen</p>
-          </div>
-        }>
+
+      <div class="max-h-[calc(100svh-var(--header-h))] overflow-y-auto">
+        <Show
+          when={events().length > 0}
+          fallback={
+            <div class="flex flex-col items-center justify-center py-20 gap-2">
+              <div class="w-8 h-8 rounded-full border border-border flex items-center justify-center">
+                <div class="w-2 h-2 rounded-full bg-border-strong" />
+              </div>
+              <p class="text-sm text-content-subtle">Waiting for events…</p>
+            </div>
+          }
+        >
           <div class="divide-y divide-border-subtle">
             <Index each={events()}>
-              {(event) => <EventCard event={event()} />}
+              {(event) => <EventRow event={event()} />}
             </Index>
           </div>
         </Show>
@@ -33,32 +40,30 @@ export const EventFeed: Component = () => {
   );
 };
 
-const EventCard: Component<{ event: Event }> = (props) => {
-  const getContent = () => {
+const EventRow: Component<{ event: Event }> = (props) => {
+  const label = () => {
     const e = props.event;
     switch (e.source) {
-      case 'earthquake':
-        return `M${e.magnitude.toFixed(1)} — ${e.place}`;
-      case 'news':
-        return e.title;
-      case 'space':
-        return `ISS orbiting at ${e.altitude}km altitude`;
-      case 'weather':
-        return `${e.temperature.toFixed(1)}°C, ${e.condition} in ${e.location}`;
-      case 'crypto':
-        const change = e.change_24h > 0 ? `+${e.change_24h.toFixed(2)}` : e.change_24h.toFixed(2);
-        return `${e.symbol} $${e.price.toFixed(2)} (${change}%)`;
-      case 'sports':
-        return `${e.home_team} vs ${e.away_team}`;
+      case 'earthquake': return `M${e.magnitude.toFixed(1)} — ${e.place}`;
+      case 'news':       return e.title;
+      case 'space':      return `ISS at ${e.altitude}km altitude`;
+      case 'weather':    return `${e.temperature.toFixed(1)}°C, ${e.condition} · ${e.location}`;
+      case 'crypto': {
+        const ch = e.change_24h > 0 ? `+${e.change_24h.toFixed(2)}` : e.change_24h.toFixed(2);
+        return `${e.symbol} $${e.price.toFixed(2)} (${ch}%)`;
+      }
+      case 'sports': return `${e.home_team} vs ${e.away_team}`;
     }
   };
 
+  const color = eventColors[props.event.source];
+
   return (
-    <div class="flex items-center gap-4 p-4 px-6 transition-colors">
-      <div class={`w-2 h-2 rounded-full ${eventColors[props.event.source].bg} shrink-0`} />
+    <div class="flex items-center gap-3.5 px-5 py-3 hover:bg-card-hover transition-colors">
+      <div class={`w-1.5 h-1.5 rounded-full shrink-0 ${color.bg}`} />
       <div class="flex-1 min-w-0">
-        <div class="text-sm text-content truncate mb-1">{getContent()}</div>
-        <div class="text-xs tabular-nums text-content-subtle">{formatTimestamp(props.event.timestamp)}</div>
+        <p class="text-sm text-content truncate">{label()}</p>
+        <p class="text-xs text-content-subtle mt-0.5 tabular-nums">{formatTimestamp(props.event.timestamp)}</p>
       </div>
     </div>
   );

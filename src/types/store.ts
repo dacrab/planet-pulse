@@ -8,19 +8,17 @@ export interface StoreState<T> {
 }
 
 export interface PollingStore<T> extends StoreState<T> {
-  fetch: () => Promise<void>;
   subscribe: () => void;
   unsubscribe: () => void;
 }
 
 export interface FilterState {
   sources: Set<EventSource>;
-  timeRange: number; // minutes
+  timeRange: number;
   searchQuery: string;
 }
 
 export interface EventStats {
   total: number;
   bySource: Record<EventSource, number>;
-  recentActivity: number;
 }

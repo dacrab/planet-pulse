@@ -1,34 +1,29 @@
-import { Component, Index } from 'solid-js';
+import { createMemo } from 'solid-js';
 import { useStore } from '../stores/context';
 import { eventColors } from '../utils/colors';
 
-export const StatsBar: Component = () => {
-  const store = useStore();
-  const stats = () => store.aggregator.stats();
-
-  const sourceData = () => {
-    const s = stats();
+export const StatsBar = () => {
+  const { aggregator } = useStore();
+  const sourceData = createMemo(() => {
+    const s = aggregator.stats().bySource;
     return [
-      { label: 'Earthquakes', count: s.bySource.earthquake, color: eventColors.earthquake },
-      { label: 'News', count: s.bySource.news, color: eventColors.news },
-      { label: 'Space', count: s.bySource.space, color: eventColors.space },
-      { label: 'Weather', count: s.bySource.weather, color: eventColors.weather },
-      { label: 'Crypto', count: s.bySource.crypto, color: eventColors.crypto },
-      { label: 'Sports', count: s.bySource.sports, color: eventColors.sports },
+      { label: 'Earthquakes', count: s.earthquake, color: eventColors.earthquake },
+      { label: 'News',        count: s.news,       color: eventColors.news },
+      { label: 'Space',       count: s.space,      color: eventColors.space },
+      { label: 'Weather',     count: s.weather,    color: eventColors.weather },
+      { label: 'Crypto',      count: s.crypto,     color: eventColors.crypto },
+      { label: 'Sports',      count: s.sports,     color: eventColors.sports },
     ];
-  };
+  });
 
   return (
-    <div class="flex items-center gap-6 px-6 py-4 bg-card border border-border rounded-xl overflow-x-auto">
-      <Index each={sourceData()}>
-        {(item) => (
-          <div class="flex items-center gap-2 whitespace-nowrap">
-            <div class={`w-2 h-2 rounded-full ${item().color.bg}`} />
-            <span class={`text-lg font-semibold tabular-nums ${item().color.text}`}>{item().count}</span>
-            <span class="text-xs text-content-muted">{item().label}</span>
-          </div>
-        )}
-      </Index>
+    <div class="grid grid-cols-3 sm:grid-cols-6 gap-2">
+      {sourceData().map(item => (
+        <div class="bg-card border border-border rounded-xl px-4 py-3 flex flex-col gap-1">
+          <div class={`text-xl font-bold tabular-nums ${item.color.text}`}>{item.count}</div>
+          <div class="text-xs text-content-subtle">{item.label}</div>
+        </div>
+      ))}
     </div>
   );
 };

@@ -1,110 +1,65 @@
 import { createMemo, Accessor } from 'solid-js';
 import { createStore } from 'solid-js/store';
-import { Event, EarthquakeEvent, SpaceEvent, CryptoEvent } from '../types/events';
-import { Alert, Correlation, AnomalyScore, AlertTier } from '../types/intelligence';
-import { calculateDistance, getRecentEvents, calculateEventScore } from '../utils/formatters';
+import { Event, EarthquakeEvent, WeatherEvent, CryptoEvent } from '../types/events';
+import { Alert, Correlation } from '../types/intelligence';
+import { calculateDistance, getRecentEvents } from '../utils/formatters';
 
 export function createIntelligenceStore(allEvents: Accessor<Event[]>) {
-  const [dismissedAlertIds, setDismissedAlertIds] = createStore<Set<string>>(new Set());
+  const [dismissed, setDismissed] = createStore<Set<string>>(new Set());
 
+  // Correlate earthquakes with nearby weather stations (both have lat/lon)
   const geoCorrelations = createMemo<Correlation[]>(() => {
-    const recentQuakes = getRecentEvents(
-      allEvents().filter(e => e.source === 'earthquake') as EarthquakeEvent[],
-      30
-    ).filter(eq => eq.magnitude >= 4.5);
-    
-    const recentFlights = getRecentEvents(
-      allEvents().filter(e => e.source === 'space') as SpaceEvent[],
-      30
-    );
+    const quakes = getRecentEvents(allEvents().filter(e => e.source === 'earthquake') as EarthquakeEvent[], 60)
+      .filter(eq => eq.magnitude >= 4.0);
+    const weather = getRecentEvents(allEvents().filter(e => e.source === 'weather') as WeatherEvent[], 60);
 
-    return recentQuakes.flatMap(eq => {
-      const nearby = recentFlights.filter(f => calculateDistance(eq.lat, eq.lon, f.lat, f.lon) < 200);
-      if (nearby.length === 0) return [];
-
+    return quakes.flatMap(eq => {
+      const nearby = weather.filter(w => calculateDistance(eq.lat, eq.lon, w.lat, w.lon) < 1000);
+      if (!nearby.length) return [];
       return [{
         id: `geo-${eq.id}`,
         type: 'geographic' as const,
-        events: [eq, ...nearby.slice(0, 5)],
-        significance: Math.min(100, eq.magnitude * 15 + nearby.length * 2),
-        description: `M${eq.magnitude} earthquake near ${nearby.length} active flights`,
+        events: [eq, ...nearby],
+        significance: Math.min(100, eq.magnitude * 15 + nearby.length * 5),
+        description: `M${eq.magnitude.toFixed(1)} quake near ${nearby.map(w => w.location).join(', ')}`,
         timestamp: Date.now(),
       }];
     });
   });
 
-  const cryptoVolatility = createMemo<AnomalyScore | null>(() => {
-    const recent = getRecentEvents(
-      allEvents().filter(e => e.source === 'crypto') as CryptoEvent[],
-      60
-    );
-
-    if (recent.length < 5) return null;
-
-    const avgChange = recent.reduce((sum, e) => sum + Math.abs(e.change_24h), 0) / recent.length;
-    const volatile = recent.filter(e => Math.abs(e.change_24h) > 5).length;
-
-    if (avgChange > 3 || volatile > 3) {
-      return {
-        source: 'crypto',
-        score: Math.min(100, avgChange * 20 + volatile * 10),
-        reason: `High volatility: ${volatile} coins moving >5%, avg change ${avgChange.toFixed(1)}%`,
-        timestamp: Date.now(),
-      };
-    }
-    return null;
-  });
-
-  const topEvents = createMemo(() => {
-    return getRecentEvents(allEvents(), 60)
-      .map(event => ({ event, score: calculateEventScore(event) }))
-      .filter(({ score }) => score > 60)
-      .sort((a, b) => b.score - a.score);
-  });
-
   const activeAlerts = createMemo<Alert[]>(() => {
     const alerts: Alert[] = [];
-    
-    geoCorrelations().forEach(corr => {
-      if (dismissedAlertIds.has(corr.id)) return;
-      
-      if (corr.significance > 70) {
+
+    for (const corr of geoCorrelations()) {
+      if (dismissed.has(corr.id) || corr.significance <= 40) continue;
+      alerts.push({
+        id: corr.id,
+        tier: corr.significance > 70 ? 'action' : 'watch',
+        title: 'Seismic Activity Near Monitored City',
+        message: corr.description,
+        timestamp: corr.timestamp,
+        events: corr.events,
+        dismissed: false,
+      });
+    }
+
+    const recent = getRecentEvents(allEvents().filter(e => e.source === 'crypto') as CryptoEvent[], 60);
+    if (recent.length >= 5) {
+      const avgChange = recent.reduce((s, e) => s + Math.abs(e.change_24h), 0) / recent.length;
+      const volatile = recent.filter(e => Math.abs(e.change_24h) > 5).length;
+      const score = Math.min(100, avgChange * 20 + volatile * 10);
+      const volId = `crypto-vol-${Math.floor(Date.now() / 60_000)}`;
+      if (score > 60 && !dismissed.has(volId)) {
         alerts.push({
-          id: corr.id,
-          tier: 'action',
-          title: 'Seismic Activity Near Flights',
-          message: corr.description,
-          timestamp: corr.timestamp,
-          events: corr.events,
+          id: volId,
+          tier: score > 80 ? 'action' : 'watch',
+          title: 'High Crypto Volatility',
+          message: `${volatile} coins moving >5%, avg change ${avgChange.toFixed(1)}%`,
+          timestamp: Date.now(),
+          events: [],
           dismissed: false,
-          correlationType: 'geographic',
-        });
-      } else if (corr.significance > 50) {
-        alerts.push({
-          id: corr.id,
-          tier: 'watch',
-          title: 'Earthquake Near Flight Path',
-          message: corr.description,
-          timestamp: corr.timestamp,
-          events: corr.events,
-          dismissed: false,
-          correlationType: 'geographic',
         });
       }
-    });
-
-    const vol = cryptoVolatility();
-    if (vol && vol.score > 60 && !dismissedAlertIds.has(`crypto-vol-${Math.floor(Date.now() / 60000)}`)) {
-      alerts.push({
-        id: `crypto-vol-${Math.floor(Date.now() / 60000)}`,
-        tier: vol.score > 80 ? 'action' : 'watch',
-        title: 'High Crypto Volatility',
-        message: vol.reason,
-        timestamp: vol.timestamp,
-        events: [],
-        dismissed: false,
-        correlationType: 'pattern',
-      });
     }
 
     return alerts;
@@ -112,9 +67,7 @@ export function createIntelligenceStore(allEvents: Accessor<Event[]>) {
 
   return {
     geoCorrelations,
-    cryptoVolatility,
-    topEvents,
     activeAlerts,
-    dismissAlert: (id: string) => setDismissedAlertIds(prev => new Set([...prev, id])),
+    dismissAlert: (id: string) => setDismissed(prev => new Set([...prev, id])),
   };
 }

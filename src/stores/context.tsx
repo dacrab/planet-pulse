@@ -1,89 +1,56 @@
-import { createContext, useContext, onMount, onCleanup, createEffect, JSX } from 'solid-js';
-import { createEarthquakeStore } from './earthquake';
-import { createNewsStore } from './news';
-import { createSpaceStore } from './space';
-import { createWeatherStore } from './weather';
-import { createCryptoStore } from './crypto';
-import { createSportsStore } from './sports';
+import { createContext, useContext, onCleanup, createEffect, JSX } from 'solid-js';
+import { createPollingStore } from './polling-factory';
 import { createEventAggregator } from './aggregator';
 import { createIntelligenceStore } from './intelligence';
 import { createAchievementsStore } from './achievements';
 import { createInsightsStore } from './insights';
+import { fetchEarthquakes } from '../services/earthquake';
+import { fetchNews } from '../services/news';
+import { fetchSpace } from '../services/space';
+import { fetchWeather } from '../services/weather';
+import { fetchCrypto } from '../services/crypto';
+import { fetchSports } from '../services/sports';
+import { API_CONFIG } from '../config/api';
 import { useVisibility } from '../hooks/useVisibility';
 
-export function createGlobalStore() {
-  const earthquakeStore = createEarthquakeStore();
-  const newsStore = createNewsStore();
-  const spaceStore = createSpaceStore();
-  const weatherStore = createWeatherStore();
-  const cryptoStore = createCryptoStore();
-  const sportsStore = createSportsStore();
+function createGlobalStore() {
+  const stores = [
+    createPollingStore(fetchEarthquakes, API_CONFIG.earthquake.interval),
+    createPollingStore(fetchNews,        API_CONFIG.news.interval),
+    createPollingStore(fetchSpace,       API_CONFIG.space.interval),
+    createPollingStore(fetchWeather,     API_CONFIG.weather.interval),
+    createPollingStore(fetchCrypto,      API_CONFIG.crypto.interval),
+    createPollingStore(fetchSports,      API_CONFIG.sports.interval),
+  ] as const;
+
+  const [earthquakeStore, newsStore, spaceStore, weatherStore, cryptoStore, sportsStore] = stores;
 
   const aggregator = createEventAggregator(
-    earthquakeStore.data,
-    newsStore.data,
-    spaceStore.data,
-    weatherStore.data,
-    cryptoStore.data,
-    sportsStore.data
+    earthquakeStore.data, newsStore.data, spaceStore.data,
+    weatherStore.data, cryptoStore.data, sportsStore.data,
   );
-
   const intelligence = createIntelligenceStore(aggregator.allEvents);
   const insights = createInsightsStore(aggregator.allEvents);
-  const achievements = createAchievementsStore(
-    aggregator.allEvents,
-    () => intelligence.geoCorrelations().length
-  );
+  const achievements = createAchievementsStore(aggregator.allEvents, () => intelligence.geoCorrelations().length);
 
-  return {
-    earthquakeStore,
-    newsStore,
-    spaceStore,
-    weatherStore,
-    cryptoStore,
-    sportsStore,
-    aggregator,
-    intelligence,
-    insights,
-    achievements,
-  };
+  return { aggregator, intelligence, insights, achievements, stores };
 }
 
 type GlobalStore = ReturnType<typeof createGlobalStore>;
-
 const StoreContext = createContext<GlobalStore>();
 
 export function StoreProvider(props: { children: JSX.Element }) {
   const store = createGlobalStore();
   const isVisible = useVisibility();
 
-  const pollingStores = [
-    store.earthquakeStore,
-    store.weatherStore,
-    store.cryptoStore,
-    store.newsStore,
-    store.sportsStore,
-    store.spaceStore,
-  ];
+  onCleanup(() => store.stores.forEach(s => s.unsubscribe()));
+  createEffect(() => store.stores.forEach(s => isVisible() ? s.subscribe() : s.unsubscribe()));
 
-  const subscribeAll = () => pollingStores.forEach(s => s.subscribe());
-  const unsubscribeAll = () => pollingStores.forEach(s => s.unsubscribe());
-
-  onMount(subscribeAll);
-  createEffect(() => isVisible() ? subscribeAll() : unsubscribeAll());
-  onCleanup(unsubscribeAll);
-
-  return (
-    <StoreContext.Provider value={store}>
-      {props.children}
-    </StoreContext.Provider>
-  );
+  return <StoreContext.Provider value={store}>{props.children}</StoreContext.Provider>;
 }
 
 export function useStore() {
-  const context = useContext(StoreContext);
-  if (!context) {
-    throw new Error('useStore must be used within StoreProvider');
-  }
-  return context;
+  const ctx = useContext(StoreContext);
+  if (!ctx) throw new Error('useStore must be used within StoreProvider');
+  return ctx;
 }

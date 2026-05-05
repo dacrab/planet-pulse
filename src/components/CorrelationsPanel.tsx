@@ -6,47 +6,29 @@ export function CorrelationsPanel() {
   const correlations = () => store.intelligence.geoCorrelations();
 
   return (
-    <div class="p-6 rounded-xl border border-border bg-card">
-      <h3 class="text-sm font-semibold text-content mb-4">
-        Correlations
-      </h3>
-      
-      <Show 
+    <div class="bg-card border border-border rounded-xl p-5">
+      <h3 class="text-xs font-semibold uppercase tracking-widest text-content-subtle mb-4">Correlations</h3>
+
+      <Show
         when={correlations().length > 0}
         fallback={
-          <div class="text-center py-8 text-sm text-content-subtle">
-            No cross-source patterns detected
-          </div>
+          <p class="text-xs text-content-subtle text-center py-6">No cross-source patterns detected</p>
         }
       >
-        <div class="flex flex-col gap-4">
+        <div class="flex flex-col gap-3">
           <Index each={correlations()}>
-            {(correlation) => (
-              <div class="p-4 rounded-lg bg-sidebar border border-border">
-                <div class="flex justify-between items-start mb-3">
-                  <div class="flex-1">
-                    <div class="text-[0.6875rem] uppercase tracking-wider text-accent font-semibold mb-1">
-                      {correlation().type}
-                    </div>
-                    <p class="text-sm leading-relaxed text-content-muted">
-                      {correlation().description}
-                    </p>
-                  </div>
-                  <div class="text-right ml-3 shrink-0">
-                    <div class="text-[0.6875rem] text-content-subtle mb-0.5">
-                      Impact
-                    </div>
-                    <div class="text-xl font-bold text-accent">
-                      {Math.round(correlation().significance)}
-                    </div>
-                  </div>
+            {(c) => (
+              <div class="bg-surface border border-border rounded-lg p-3">
+                <div class="flex items-start justify-between gap-2 mb-2">
+                  <p class="text-[10px] font-semibold uppercase tracking-widest text-accent">{c().type}</p>
+                  <span class="text-sm font-bold text-accent tabular-nums">{Math.round(c().significance)}</span>
                 </div>
-                
-                <div class="flex flex-wrap gap-1.5">
-                  <Index each={correlation().events}>
-                    {(event) => (
-                      <span class="text-[0.6875rem] px-2 py-1 bg-border/50 rounded text-content-subtle capitalize">
-                        {event().source}
+                <p class="text-xs text-content-muted leading-relaxed mb-2">{c().description}</p>
+                <div class="flex flex-wrap gap-1">
+                  <Index each={c().events}>
+                    {(ev) => (
+                      <span class="text-[10px] px-1.5 py-0.5 bg-border/40 rounded text-content-subtle capitalize">
+                        {ev().source}
                       </span>
                     )}
                   </Index>
