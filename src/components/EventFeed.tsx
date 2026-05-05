@@ -40,6 +40,16 @@ export const EventFeed: Component = () => {
   );
 };
 
+const getEventUrl = (e: Event): string | null => {
+  switch (e.source) {
+    case 'earthquake': return `https://earthquake.usgs.gov/earthquakes/eventpage/${e.id}`;
+    case 'news':       return e.url;
+    case 'crypto':     return `https://www.coingecko.com/en/coins/${e.id}`;
+    case 'sports':     return `https://www.thesportsdb.com/event/${e.id}`;
+    default:           return null;
+  }
+};
+
 const EventRow: Component<{ event: Event }> = (props) => {
   const label = () => {
     const e = props.event;
@@ -56,15 +66,24 @@ const EventRow: Component<{ event: Event }> = (props) => {
     }
   };
 
+  const url = getEventUrl(props.event);
   const color = eventColors[props.event.source];
-
-  return (
-    <div class="flex items-center gap-3.5 px-5 py-3 hover:bg-card-hover transition-colors">
+  const inner = (
+    <>
       <div class={`w-1.5 h-1.5 rounded-full shrink-0 ${color.bg}`} />
       <div class="flex-1 min-w-0">
         <p class="text-sm text-content truncate">{label()}</p>
         <p class="text-xs text-content-subtle mt-0.5 tabular-nums">{formatTimestamp(props.event.timestamp)}</p>
       </div>
-    </div>
+      <Show when={url}>
+        <span class="text-content-subtle text-xs shrink-0">↗</span>
+      </Show>
+    </>
   );
+
+  const cls = "flex items-center gap-3.5 px-5 py-3 hover:bg-card-hover transition-colors";
+
+  return url
+    ? <a href={url} target="_blank" rel="noopener noreferrer" class={cls}>{inner}</a>
+    : <div class={cls}>{inner}</div>;
 };
