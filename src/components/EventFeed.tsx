@@ -9,7 +9,7 @@ export const EventFeed: Component = () => {
   const events = () => store.aggregator.filteredEvents();
 
   return (
-    <div class="bg-card border border-border rounded-xl flex flex-col self-start sticky top-[var(--header-h)]">
+    <div class="bg-card border border-border rounded-xl flex flex-col self-start lg:sticky lg:top-[var(--header-h)]">
       <div class="flex items-center justify-between px-5 py-3.5 border-b border-border">
         <span class="text-sm font-medium text-content">Live Feed</span>
         <span class="text-xs tabular-nums font-semibold text-content-subtle bg-surface px-2 py-0.5 rounded-md">
@@ -17,7 +17,7 @@ export const EventFeed: Component = () => {
         </span>
       </div>
 
-      <div class="max-h-[calc(100svh-var(--header-h))] overflow-y-auto">
+      <div class="max-h-[calc(100svh-var(--header-h)-5rem)] lg:max-h-[calc(100svh-var(--header-h))] overflow-y-auto">
         <Show
           when={events().length > 0}
           fallback={
