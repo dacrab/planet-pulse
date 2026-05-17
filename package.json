@@ -11,7 +11,7 @@
   "devDependencies": {
     "@tailwindcss/vite": "^4.3.0",
     "tailwindcss": "^4.3.0",
-    "vite": "^8.0.11",
+    "vite": "^8.0.13",
     "vite-plugin-solid": "^2.11.12"
   },
   "peerDependencies": {
@@ -22,6 +22,6 @@
     "@solidjs/router": "^0.16.1",
     "@vercel/analytics": "^2.0.1",
     "@vercel/speed-insights": "^2.0.0",
-    "solid-js": "^1.9.12"
+    "solid-js": "^1.9.13"
   }
 }
