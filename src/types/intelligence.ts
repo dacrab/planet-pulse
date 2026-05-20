@@ -1,5 +1,3 @@
-import { EventSource } from './events';
-
 export type AlertTier = 'fyi' | 'watch' | 'action';
 
 export interface Alert {
@@ -10,7 +8,6 @@ export interface Alert {
   timestamp: number;
   events: import('./events').Event[];
   dismissed: boolean;
-  correlationType?: string;
 }
 
 export interface Correlation {
@@ -20,15 +17,4 @@ export interface Correlation {
   significance: number;
   description: string;
   timestamp: number;
-}
-
-export interface Achievement {
-  id: string;
-  name: string;
-  description: string;
-  icon: string;
-  unlocked: boolean;
-  unlockedAt?: number;
-  progress?: number;
-  target?: number;
 }

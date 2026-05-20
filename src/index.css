@@ -5,18 +5,14 @@
   --color-surface: #111118;
   --color-card: #16161f;
   --color-card-hover: #1c1c27;
-  --color-sidebar: #0e0e16;
-  --color-hover: #1c1c27;
-  --color-border: #ffffff0f;
-  --color-border-subtle: #ffffff07;
-  --color-border-strong: #ffffff18;
+  --color-border: #ffffff0d;
+  --color-border-strong: #ffffff1a;
 
-  --color-content: #f0f0f5;
-  --color-content-muted: #9090a8;
-  --color-content-subtle: #5a5a72;
+  --color-content: #e8e8f0;
+  --color-content-muted: #8888a0;
+  --color-content-subtle: #555568;
 
   --color-accent: #7c6af7;
-  --color-accent-glow: #7c6af720;
 
   --color-earthquake: #f97316;
   --color-news: #e879f9;
@@ -31,15 +27,9 @@
   --color-info: #6366f1;
 }
 
-:root {
-  --header-h: 3.5rem; /* h-14 */
-  --layout-max: 1800px;
-}
-
 html {
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
   background-color: var(--color-page);
   color: var(--color-content);
 }
@@ -47,7 +37,6 @@ html {
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
     animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
   }
 }
@@ -55,7 +44,3 @@ html {
 ::-webkit-scrollbar { width: 4px; height: 4px; }
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: var(--color-border-strong); border-radius: 99px; }
-::-webkit-scrollbar-thumb:hover { background: var(--color-content-subtle); }
-
-.scrollbar-none { scrollbar-width: none; }
-.scrollbar-none::-webkit-scrollbar { display: none; }

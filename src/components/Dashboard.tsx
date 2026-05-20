@@ -1,4 +1,5 @@
-import { Component, createSignal, lazy, Show } from 'solid-js';
+import { Component, createSignal, lazy, Show, Suspense, ErrorBoundary } from 'solid-js';
+import { useStore } from '../stores/context';
 import { EventFeed } from './EventFeed';
 import { StatsBar } from './StatsBar';
 import { FilterPanel } from './FilterPanel';
@@ -6,87 +7,89 @@ import { AlertsPanel } from './AlertsPanel';
 
 const InsightsPanel = lazy(() => import('./InsightsPanel').then(m => ({ default: m.InsightsPanel })));
 const CorrelationsPanel = lazy(() => import('./CorrelationsPanel').then(m => ({ default: m.CorrelationsPanel })));
-const AchievementsPanel = lazy(() => import('./AchievementsPanel').then(m => ({ default: m.AchievementsPanel })));
 
-type MobileTab = 'feed' | 'filter' | 'insights';
+type Tab = 'feed' | 'filter' | 'insights';
 
-const tabs: { id: MobileTab; label: string; icon: string }[] = [
-  { id: 'feed',     label: 'Feed',    icon: '📡' },
-  { id: 'filter',   label: 'Filter',  icon: '🔍' },
-  { id: 'insights', label: 'Insights',icon: '📊' },
-];
+const statusConfig = {
+  connected:  { color: 'bg-success', label: 'Live' },
+  connecting: { color: 'bg-warning', label: 'Connecting' },
+  error:      { color: 'bg-danger',  label: 'Error' },
+} as const;
+
+const PanelFallback = () => (
+  <div class="text-xs text-content-subtle text-center py-4">Loading…</div>
+);
 
 export const Dashboard: Component = () => {
-  const [activeTab, setActiveTab] = createSignal<MobileTab>('feed');
+  const { status } = useStore();
+  const [tab, setTab] = createSignal<Tab>('feed');
 
   return (
-    <div class="min-h-screen bg-page text-content">
-      {/* Header */}
-      <header class="h-[var(--header-h)] border-b border-border bg-surface/80 backdrop-blur-xl sticky top-0 z-50">
-        <div class="max-w-[var(--layout-max)] mx-auto h-full px-4 sm:px-6 flex items-center justify-between">
-          <div class="flex items-center gap-3">
-            <div class="w-7 h-7 rounded-lg bg-accent/20 border border-accent/30 flex items-center justify-center">
-              <div class="w-2.5 h-2.5 rounded-full bg-accent" />
-            </div>
-            <div>
-              <span class="text-sm font-semibold tracking-tight text-content">Planet Pulse</span>
-              <span class="hidden sm:inline text-xs text-content-subtle ml-2">real-time intelligence</span>
-            </div>
-          </div>
+    <div class="h-screen flex flex-col bg-page text-content overflow-hidden">
+      <header class="shrink-0 h-12 border-b border-border bg-surface/80 backdrop-blur-md sticky top-0 z-50">
+        <div class="h-full px-5 flex items-center justify-between">
           <div class="flex items-center gap-2">
-            <div class="w-1.5 h-1.5 rounded-full bg-success animate-[pulse_2s_ease-in-out_infinite]" />
-            <span class="text-xs font-medium text-content-subtle tracking-widest uppercase">Live</span>
+            <div class="w-2 h-2 rounded-full bg-accent" />
+            <span class="text-sm font-semibold">Planet Pulse</span>
+          </div>
+          <StatsBar />
+          <div class="flex items-center gap-2">
+            <div class={`w-1.5 h-1.5 rounded-full ${statusConfig[status()].color} ${status() === 'connected' ? 'animate-pulse' : ''}`} />
+            <span class="text-[11px] text-content-subtle uppercase tracking-wider">{statusConfig[status()].label}</span>
           </div>
         </div>
       </header>
 
-      {/* Main — desktop: 3-col grid, mobile: tab-driven single column */}
-      <main class="max-w-[var(--layout-max)] mx-auto px-4 sm:px-6 py-4 sm:py-6 space-y-4 pb-20 lg:pb-6">
-        <StatsBar />
-        <AlertsPanel />
+      <AlertsPanel />
 
-        {/* Desktop layout */}
-        <div class="hidden lg:grid grid-cols-[220px_1fr_300px] gap-4">
-          <FilterPanel />
-          <EventFeed />
-          <div class="flex flex-col gap-4">
-            <InsightsPanel />
-            <CorrelationsPanel />
-            <AchievementsPanel />
+      <ErrorBoundary fallback={(err) => (
+        <div class="flex-1 flex items-center justify-center">
+          <div class="text-center">
+            <p class="text-sm text-danger font-medium">Something went wrong</p>
+            <p class="text-xs text-content-subtle mt-1">{err.message}</p>
           </div>
         </div>
-
-        {/* Mobile layout — show active tab panel */}
-        <div class="lg:hidden">
-          <Show when={activeTab() === 'feed'}>
-            <EventFeed />
-          </Show>
-          <Show when={activeTab() === 'filter'}>
+      )}>
+        {/* Desktop: full-height 3-col */}
+        <div class="hidden lg:grid lg:grid-cols-[180px_1fr_260px] flex-1 min-h-0">
+          <aside class="border-r border-border p-4 overflow-y-auto">
             <FilterPanel />
-          </Show>
-          <Show when={activeTab() === 'insights'}>
-            <div class="flex flex-col gap-4">
+          </aside>
+          <main class="overflow-y-auto p-4">
+            <EventFeed />
+          </main>
+          <aside class="border-l border-border p-4 overflow-y-auto space-y-4">
+            <Suspense fallback={<PanelFallback />}>
               <InsightsPanel />
               <CorrelationsPanel />
-              <AchievementsPanel />
-            </div>
+            </Suspense>
+          </aside>
+        </div>
+
+        {/* Mobile: tabbed */}
+        <div class="lg:hidden flex-1 min-h-0 overflow-y-auto p-4">
+          <Show when={tab() === 'feed'}><EventFeed /></Show>
+          <Show when={tab() === 'filter'}><FilterPanel /></Show>
+          <Show when={tab() === 'insights'}>
+            <Suspense fallback={<PanelFallback />}>
+              <div class="space-y-4">
+                <InsightsPanel />
+                <CorrelationsPanel />
+              </div>
+            </Suspense>
           </Show>
         </div>
-      </main>
+      </ErrorBoundary>
 
-      {/* Mobile bottom tab bar */}
-      <nav class="lg:hidden fixed bottom-0 inset-x-0 z-50 bg-surface/95 backdrop-blur-xl border-t border-border flex">
-        {tabs.map(tab => (
+      <nav class="lg:hidden shrink-0 bg-surface/95 backdrop-blur-md border-t border-border flex">
+        {(['feed', 'filter', 'insights'] as Tab[]).map(t => (
           <button
-            onClick={() => setActiveTab(tab.id)}
-            class={`flex-1 flex flex-col items-center justify-center gap-1 py-3 text-xs font-medium transition-colors ${
-              activeTab() === tab.id
-                ? 'text-accent'
-                : 'text-content-subtle hover:text-content'
+            onClick={() => setTab(t)}
+            class={`flex-1 py-3 text-xs font-medium capitalize transition-colors ${
+              tab() === t ? 'text-accent' : 'text-content-subtle'
             }`}
           >
-            <span class="text-base leading-none">{tab.icon}</span>
-            <span>{tab.label}</span>
+            {t}
           </button>
         ))}
       </nav>

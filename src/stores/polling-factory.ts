@@ -1,4 +1,4 @@
-import { createSignal, onCleanup } from 'solid-js';
+import { createSignal, onCleanup, batch } from 'solid-js';
 import { PollingStore } from '../types/store';
 
 export function createPollingStore<T>(fetchFn: () => Promise<T[]>, interval: number): PollingStore<T> {
@@ -7,20 +7,31 @@ export function createPollingStore<T>(fetchFn: () => Promise<T[]>, interval: num
   const [error, setError] = createSignal<string | null>(null);
   let intervalId: number | null = null;
 
-  const fetch = async () => {
+  const poll = async () => {
     setLoading(true);
-    setError(null);
     try {
-      setData(await fetchFn());
+      const result = await fetchFn();
+      batch(() => {
+        setData(result);
+        setError(null);
+        setLoading(false);
+      });
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Unknown error');
-    } finally {
-      setLoading(false);
+      batch(() => {
+        setError(err instanceof Error ? err.message : 'Fetch failed');
+        setLoading(false);
+      });
     }
   };
 
-  const subscribe = () => { fetch(); intervalId = setInterval(fetch, interval) as unknown as number; };
-  const unsubscribe = () => { if (intervalId) { clearInterval(intervalId); intervalId = null; } };
+  const subscribe = () => {
+    poll();
+    intervalId = setInterval(poll, interval) as unknown as number;
+  };
+
+  const unsubscribe = () => {
+    if (intervalId) { clearInterval(intervalId); intervalId = null; }
+  };
 
   onCleanup(unsubscribe);
   return { data, loading, error, subscribe, unsubscribe };

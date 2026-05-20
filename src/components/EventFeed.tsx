@@ -9,33 +9,22 @@ export const EventFeed: Component = () => {
   const events = () => store.aggregator.filteredEvents();
 
   return (
-    <div class="bg-card border border-border rounded-xl flex flex-col self-start lg:sticky lg:top-[var(--header-h)]">
-      <div class="flex items-center justify-between px-5 py-3.5 border-b border-border">
-        <span class="text-sm font-medium text-content">Live Feed</span>
-        <span class="text-xs tabular-nums font-semibold text-content-subtle bg-surface px-2 py-0.5 rounded-md">
-          {events().length}
-        </span>
+    <div class="flex flex-col h-full">
+      <div class="flex items-center justify-between pb-3">
+        <span class="text-sm font-medium">Live Feed</span>
+        <span class="text-xs tabular-nums text-content-subtle">{events().length} events</span>
       </div>
 
-      <div class="max-h-[calc(100svh-var(--header-h)-5rem)] lg:max-h-[calc(100svh-var(--header-h))] overflow-y-auto">
-        <Show
-          when={events().length > 0}
-          fallback={
-            <div class="flex flex-col items-center justify-center py-20 gap-2">
-              <div class="w-8 h-8 rounded-full border border-border flex items-center justify-center">
-                <div class="w-2 h-2 rounded-full bg-border-strong" />
-              </div>
-              <p class="text-sm text-content-subtle">Waiting for events…</p>
-            </div>
-          }
-        >
-          <div class="divide-y divide-border-subtle">
-            <Index each={events()}>
-              {(event) => <EventRow event={event()} />}
-            </Index>
-          </div>
-        </Show>
-      </div>
+      <Show
+        when={events().length > 0}
+        fallback={<p class="text-sm text-content-subtle text-center py-12">Waiting for events…</p>}
+      >
+        <div class="space-y-px">
+          <Index each={events()}>
+            {(event) => <EventRow event={event()} />}
+          </Index>
+        </div>
+      </Show>
     </div>
   );
 };
@@ -56,10 +45,10 @@ const EventRow: Component<{ event: Event }> = (props) => {
     switch (e.source) {
       case 'earthquake': return `M${e.magnitude.toFixed(1)} — ${e.place}`;
       case 'news':       return e.title;
-      case 'space':      return `ISS at ${e.altitude}km altitude`;
-      case 'weather':    return `${e.temperature.toFixed(1)}°C, ${e.condition} · ${e.location}`;
+      case 'space':      return `ISS ${e.altitude}km`;
+      case 'weather':    return `${e.temperature.toFixed(1)}°C ${e.condition} · ${e.location}`;
       case 'crypto': {
-        const ch = e.change_24h > 0 ? `+${e.change_24h.toFixed(2)}` : e.change_24h.toFixed(2);
+        const ch = e.change_24h > 0 ? `+${e.change_24h.toFixed(1)}` : e.change_24h.toFixed(1);
         return `${e.symbol} $${e.price.toFixed(2)} (${ch}%)`;
       }
       case 'sports': return `${e.home_team} vs ${e.away_team}`;
@@ -68,22 +57,21 @@ const EventRow: Component<{ event: Event }> = (props) => {
 
   const url = getEventUrl(props.event);
   const color = eventColors[props.event.source];
-  const inner = (
+
+  const content = (
     <>
       <div class={`w-1.5 h-1.5 rounded-full shrink-0 ${color.bg}`} />
-      <div class="flex-1 min-w-0">
-        <p class="text-sm text-content truncate">{label()}</p>
-        <p class="text-xs text-content-subtle mt-0.5 tabular-nums">{formatTimestamp(props.event.timestamp)}</p>
-      </div>
-      <Show when={url}>
-        <span class="text-content-subtle text-xs shrink-0">↗</span>
-      </Show>
+      <span class="flex-1 min-w-0 text-[13px] text-content truncate">{label()}</span>
+      <span class="text-[11px] text-content-subtle tabular-nums shrink-0">{formatTimestamp(props.event.timestamp)}</span>
     </>
   );
 
-  const cls = "flex items-center gap-3.5 px-5 py-3 hover:bg-card-hover transition-colors";
+  const base = "flex items-center gap-3 px-3 py-2 rounded-md transition-colors";
 
   return url
-    ? <a href={url} target="_blank" rel="noopener noreferrer" class={cls}>{inner}</a>
-    : <div class={cls}>{inner}</div>;
+    ? <a href={url} target="_blank" rel="noopener noreferrer" class={`${base} hover:bg-card-hover cursor-pointer group`}>
+        {content}
+        <span class="text-[11px] text-content-subtle group-hover:text-accent shrink-0">↗</span>
+      </a>
+    : <div class={base}>{content}</div>;
 };

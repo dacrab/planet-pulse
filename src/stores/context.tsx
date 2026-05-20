@@ -1,8 +1,7 @@
-import { createContext, useContext, onCleanup, createEffect, JSX } from 'solid-js';
+import { createContext, useContext, onCleanup, createEffect, createMemo, JSX } from 'solid-js';
 import { createPollingStore } from './polling-factory';
 import { createEventAggregator } from './aggregator';
 import { createIntelligenceStore } from './intelligence';
-import { createAchievementsStore } from './achievements';
 import { createInsightsStore } from './insights';
 import { fetchEarthquakes } from '../services/earthquake';
 import { fetchNews } from '../services/news';
@@ -31,9 +30,17 @@ function createGlobalStore() {
   );
   const intelligence = createIntelligenceStore(aggregator.allEvents);
   const insights = createInsightsStore(aggregator.allEvents);
-  const achievements = createAchievementsStore(aggregator.allEvents, () => intelligence.geoCorrelations().length);
 
-  return { aggregator, intelligence, insights, achievements, stores };
+  const status = createMemo(() => {
+    const hasError = stores.some(s => s.error() !== null);
+    const isLoading = stores.some(s => s.loading());
+    const hasData = stores.some(s => s.data().length > 0);
+    if (hasError) return 'error' as const;
+    if (!hasData && isLoading) return 'connecting' as const;
+    return 'connected' as const;
+  });
+
+  return { aggregator, intelligence, insights, stores, status };
 }
 
 type GlobalStore = ReturnType<typeof createGlobalStore>;
