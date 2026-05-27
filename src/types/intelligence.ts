@@ -7,7 +7,6 @@ export interface Alert {
   message: string;
   timestamp: number;
   events: import('./events').Event[];
-  dismissed: boolean;
 }
 
 export interface Correlation {

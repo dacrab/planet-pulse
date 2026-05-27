@@ -1,31 +1,26 @@
-import { createMemo } from 'solid-js';
+import { Index } from 'solid-js';
 import { useStore } from '../stores/context';
 import { eventColors } from '../utils/colors';
+import { SOURCES } from '../config/sources';
 
 export const StatsBar = () => {
   const { aggregator } = useStore();
-  const sources = createMemo(() => {
-    const s = aggregator.stats().bySource;
-    return [
-      { key: 'earthquake', count: s.earthquake, color: eventColors.earthquake },
-      { key: 'news',       count: s.news,       color: eventColors.news },
-      { key: 'space',      count: s.space,      color: eventColors.space },
-      { key: 'weather',    count: s.weather,    color: eventColors.weather },
-      { key: 'crypto',     count: s.crypto,     color: eventColors.crypto },
-      { key: 'sports',     count: s.sports,     color: eventColors.sports },
-    ];
-  });
 
   return (
-    <div class="hidden sm:flex items-center gap-3">
-      {sources().map(s => (
-        <div class="flex items-center gap-1.5">
-          <div class={`w-1.5 h-1.5 rounded-full ${s.color.bg}`} />
-          <span class={`text-xs font-medium tabular-nums ${s.count > 0 ? 'text-content' : 'text-content-subtle'}`}>
-            {s.count}
-          </span>
-        </div>
-      ))}
+    <div class="hidden md:flex items-center gap-1">
+      <Index each={SOURCES}>
+        {(src) => {
+          const enabled = () => aggregator.filters.sources.has(src().id);
+          const count = () => aggregator.stats().bySource[src().id];
+          return (
+            <div class={`flex items-center gap-1.5 px-2.5 py-1 rounded-md transition-colors ${enabled() ? 'text-content' : 'text-content-subtle'}`}>
+              <div class={`w-1.5 h-1.5 rounded-full transition-opacity ${eventColors[src().id].bg} ${enabled() ? '' : 'opacity-30'}`} />
+              <span class="text-xs font-medium">{src().shortLabel}</span>
+              <span class="text-xs tabular-nums text-content-subtle">{count()}</span>
+            </div>
+          );
+        }}
+      </Index>
     </div>
   );
 };

@@ -5,24 +5,14 @@ export async function fetchWithTimeout(
 ): Promise<Response> {
   const controller = new AbortController();
   const id = setTimeout(() => controller.abort(), timeout);
-
   try {
-    const response = await fetch(url, {
-      ...options,
-      signal: controller.signal,
-    });
+    const response = await fetch(url, { ...options, signal: controller.signal });
     clearTimeout(id);
-
-    if (!response.ok) {
-      throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-    }
-
+    if (!response.ok) throw new Error(`HTTP ${response.status}: ${response.statusText}`);
     return response;
   } catch (error) {
     clearTimeout(id);
-    if (error instanceof Error && error.name === 'AbortError') {
-      throw new Error('Request timeout');
-    }
-    throw error instanceof Error ? error : new Error('Unknown error');
+    if (error instanceof Error && error.name === 'AbortError') throw new Error('Request timeout');
+    throw error;
   }
 }

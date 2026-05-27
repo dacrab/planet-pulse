@@ -13,7 +13,7 @@ export function createEventAggregator(
 ) {
   const [filters, setFilters] = createStore<FilterState>({
     sources: new Set<EventSource>(['earthquake', 'news', 'space', 'weather', 'crypto', 'sports']),
-    timeRange: 720,
+    timeRange: null,
     searchQuery: '',
   });
 
@@ -23,7 +23,7 @@ export function createEventAggregator(
   );
 
   const filteredEvents = createMemo(() => {
-    const timeLimit = Date.now() - filters.timeRange * 60_000;
+    const timeLimit = filters.timeRange ? Date.now() - filters.timeRange * 60_000 : 0;
     const query = filters.searchQuery.toLowerCase();
     return allEvents().filter(e =>
       filters.sources.has(e.source) &&

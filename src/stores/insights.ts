@@ -12,8 +12,6 @@ export function createInsightsStore(allEvents: Accessor<Event[]>) {
       return s > max.score ? { event: e, score: s } : max;
     }, { event: recent[0], score: calculateEventScore(recent[0]) });
 
-    if (best.score === 0) return null;
-
     const { event } = best;
     let description = '';
     if (event.source === 'earthquake') {
@@ -29,16 +27,5 @@ export function createInsightsStore(allEvents: Accessor<Event[]>) {
     return { event, description, score: best.score };
   });
 
-  const trend = createMemo(() => {
-    const now = Date.now();
-    const last15 = allEvents().filter(e => e.timestamp > now - 15 * 60_000).length;
-    const prev15 = allEvents().filter(e => e.timestamp > now - 30 * 60_000 && e.timestamp <= now - 15 * 60_000).length;
-    // On cold start prev15 is 0; fall back to comparing against total as baseline
-    const baseline = prev15 || allEvents().length;
-    if (!baseline) return { trend: 'stable', change: 0 };
-    const change = ((last15 - (prev15 || last15)) / baseline) * 100;
-    return { trend: change > 20 ? 'increasing' : change < -20 ? 'decreasing' : 'stable', change };
-  });
-
-  return { topEvent, trend };
+  return { topEvent };
 }

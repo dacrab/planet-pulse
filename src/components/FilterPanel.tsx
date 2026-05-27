@@ -2,22 +2,15 @@ import { Index } from 'solid-js';
 import { useStore } from '../stores/context';
 import { EventSource } from '../types/events';
 import { eventColors } from '../utils/colors';
+import { SOURCES } from '../config/sources';
 
-const sources: { id: EventSource; label: string }[] = [
-  { id: 'earthquake', label: 'Quakes' },
-  { id: 'news',       label: 'News' },
-  { id: 'space',      label: 'Space' },
-  { id: 'weather',    label: 'Weather' },
-  { id: 'crypto',     label: 'Crypto' },
-  { id: 'sports',     label: 'Sports' },
-];
-
-const timeRanges = [
+const TIME_RANGES = [
   { value: 5,   label: '5m' },
   { value: 15,  label: '15m' },
   { value: 30,  label: '30m' },
   { value: 60,  label: '1h' },
   { value: 180, label: '3h' },
+  { value: 720, label: '12h' },
 ];
 
 export const FilterPanel = () => {
@@ -30,29 +23,31 @@ export const FilterPanel = () => {
   };
 
   return (
-    <div class="space-y-4">
-      <div>
-        <label class="text-[10px] font-semibold uppercase tracking-widest text-content-subtle mb-1.5 block">Search</label>
+    <div class="p-5 space-y-6">
+      {/* Search */}
+      <div class="space-y-2">
+        <p class="text-xs font-semibold text-content-muted uppercase tracking-widest">Search</p>
         <input
           type="text"
-          placeholder="Filter…"
+          placeholder="Filter events…"
           value={filters.searchQuery}
           onInput={(e) => setFilters('searchQuery', e.currentTarget.value)}
-          class="w-full px-3 py-1.5 bg-card border border-border rounded-lg text-sm text-content placeholder:text-content-subtle focus:outline-none focus:border-accent/50"
+          class="w-full px-3 py-2 bg-card border border-border rounded-lg text-sm text-content placeholder:text-content-subtle focus:outline-none focus:border-accent/50 transition-colors"
         />
       </div>
 
-      <div>
-        <label class="text-[10px] font-semibold uppercase tracking-widest text-content-subtle mb-1.5 block">Time</label>
-        <div class="flex flex-wrap gap-1">
-          <Index each={timeRanges}>
+      {/* Time range */}
+      <div class="space-y-2">
+        <p class="text-xs font-semibold text-content-muted uppercase tracking-widest">Time Range</p>
+        <div class="grid grid-cols-3 gap-1">
+          <Index each={TIME_RANGES}>
             {(r) => (
               <button
-                onClick={() => setFilters('timeRange', r().value)}
-                class={`px-2 py-1 text-xs rounded-md border transition-colors ${
+                onClick={() => setFilters('timeRange', filters.timeRange === r().value ? null : r().value)}
+                class={`py-1.5 text-xs rounded-md border transition-colors ${
                   filters.timeRange === r().value
-                    ? 'bg-accent/15 border-accent/40 text-accent'
-                    : 'border-border text-content-subtle hover:text-content'
+                    ? 'bg-accent/15 border-accent/40 text-accent font-medium'
+                    : 'border-border text-content-subtle hover:text-content hover:border-border-strong'
                 }`}
               >
                 {r().label}
@@ -62,22 +57,22 @@ export const FilterPanel = () => {
         </div>
       </div>
 
-      <div>
-        <label class="text-[10px] font-semibold uppercase tracking-widest text-content-subtle mb-1.5 block">Sources</label>
-        <div class="grid grid-cols-2 lg:grid-cols-1 gap-0.5">
-          <Index each={sources}>
+      {/* Sources */}
+      <div class="space-y-2">
+        <p class="text-xs font-semibold text-content-muted uppercase tracking-widest">Sources</p>
+        <div class="space-y-0.5">
+          <Index each={SOURCES}>
             {(s) => {
               const active = () => filters.sources.has(s().id);
-              const color = eventColors[s().id];
               return (
                 <button
                   onClick={() => toggleSource(s().id)}
-                  class={`flex items-center gap-2 px-2.5 py-1.5 rounded-md text-left transition-colors ${
-                    active() ? 'bg-card text-content' : 'text-content-subtle hover:text-content'
+                  class={`w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-left transition-colors ${
+                    active() ? 'bg-card text-content' : 'text-content-subtle hover:text-content hover:bg-card/50'
                   }`}
                 >
-                  <div class={`w-1.5 h-1.5 rounded-full ${color.bg} ${active() ? '' : 'opacity-30'}`} />
-                  <span class="text-xs">{s().label}</span>
+                  <div class={`w-2 h-2 rounded-full shrink-0 ${eventColors[s().id].bg} ${active() ? '' : 'opacity-30'}`} />
+                  <span class="text-sm">{s().label}</span>
                 </button>
               );
             }}

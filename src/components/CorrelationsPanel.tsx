@@ -1,31 +1,27 @@
 import { Index, Show } from 'solid-js';
 import { useStore } from '../stores/context';
+import { eventColors } from '../utils/colors';
 
 export function CorrelationsPanel() {
-  const store = useStore();
-  const correlations = () => store.intelligence.geoCorrelations();
+  const { intelligence } = useStore();
 
   return (
-    <div class="bg-card border border-border rounded-lg p-4">
-      <h3 class="text-[10px] font-semibold uppercase tracking-widest text-content-subtle mb-3">Correlations</h3>
-
-      <Show
-        when={correlations().length > 0}
-        fallback={<p class="text-xs text-content-subtle text-center py-4">No patterns detected</p>}
-      >
+    <Show when={intelligence.geoCorrelations().length > 0}>
+      <div class="p-5">
+        <p class="text-xs font-semibold text-content-muted uppercase tracking-widest mb-3">Correlations</p>
         <div class="space-y-2">
-          <Index each={correlations()}>
+          <Index each={intelligence.geoCorrelations()}>
             {(c) => (
-              <div class="bg-surface rounded-md p-3">
+              <div class="bg-surface rounded-lg p-3 border border-border">
                 <div class="flex items-center justify-between mb-1.5">
-                  <span class="text-[10px] font-semibold uppercase tracking-wider text-accent">{c().type}</span>
-                  <span class="text-xs font-bold text-accent tabular-nums">{Math.round(c().significance)}</span>
+                  <span class="text-[11px] font-semibold uppercase tracking-wider text-accent">{c().type}</span>
+                  <span class="text-xs font-bold tabular-nums text-content-muted">{Math.round(c().significance)}</span>
                 </div>
-                <p class="text-xs text-content-muted leading-snug mb-2">{c().description}</p>
+                <p class="text-xs text-content leading-snug mb-2">{c().description}</p>
                 <div class="flex flex-wrap gap-1">
                   <Index each={c().events}>
                     {(ev) => (
-                      <span class="text-[10px] px-1.5 py-0.5 bg-border/50 rounded text-content-subtle capitalize">
+                      <span class={`text-[10px] px-1.5 py-0.5 rounded font-medium capitalize ${eventColors[ev().source].text} bg-current/10`}>
                         {ev().source}
                       </span>
                     )}
@@ -35,7 +31,7 @@ export function CorrelationsPanel() {
             )}
           </Index>
         </div>
-      </Show>
-    </div>
+      </div>
+    </Show>
   );
 }

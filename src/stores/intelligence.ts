@@ -1,11 +1,10 @@
-import { createMemo, Accessor } from 'solid-js';
-import { createStore } from 'solid-js/store';
+import { createMemo, createSignal, Accessor } from 'solid-js';
 import { Event, EarthquakeEvent, WeatherEvent, CryptoEvent } from '../types/events';
 import { Alert, Correlation } from '../types/intelligence';
 import { calculateDistance, getRecentEvents } from '../utils/formatters';
 
 export function createIntelligenceStore(allEvents: Accessor<Event[]>) {
-  const [dismissed, setDismissed] = createStore<Set<string>>(new Set());
+  const [dismissed, setDismissed] = createSignal(new Set<string>());
 
   // Correlate earthquakes with nearby weather stations (both have lat/lon)
   const geoCorrelations = createMemo<Correlation[]>(() => {
@@ -31,7 +30,7 @@ export function createIntelligenceStore(allEvents: Accessor<Event[]>) {
     const alerts: Alert[] = [];
 
     for (const corr of geoCorrelations()) {
-      if (dismissed.has(corr.id) || corr.significance <= 40) continue;
+      if (dismissed().has(corr.id) || corr.significance <= 40) continue;
       alerts.push({
         id: corr.id,
         tier: corr.significance > 70 ? 'action' : 'watch',
@@ -39,7 +38,6 @@ export function createIntelligenceStore(allEvents: Accessor<Event[]>) {
         message: corr.description,
         timestamp: corr.timestamp,
         events: corr.events,
-        dismissed: false,
       });
     }
 
@@ -48,8 +46,8 @@ export function createIntelligenceStore(allEvents: Accessor<Event[]>) {
       const avgChange = recent.reduce((s, e) => s + Math.abs(e.change_24h), 0) / recent.length;
       const volatile = recent.filter(e => Math.abs(e.change_24h) > 5).length;
       const score = Math.min(100, avgChange * 20 + volatile * 10);
-      const volId = `crypto-vol-${Math.floor(Date.now() / 60_000)}`;
-      if (score > 60 && !dismissed.has(volId)) {
+      const volId = 'crypto-vol';
+      if (score > 60 && !dismissed().has(volId)) {
         alerts.push({
           id: volId,
           tier: score > 80 ? 'action' : 'watch',
@@ -57,7 +55,6 @@ export function createIntelligenceStore(allEvents: Accessor<Event[]>) {
           message: `${volatile} coins moving >5%, avg change ${avgChange.toFixed(1)}%`,
           timestamp: Date.now(),
           events: [],
-          dismissed: false,
         });
       }
     }

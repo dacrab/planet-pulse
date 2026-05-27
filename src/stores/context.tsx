@@ -32,10 +32,10 @@ function createGlobalStore() {
   const insights = createInsightsStore(aggregator.allEvents);
 
   const status = createMemo(() => {
-    const hasError = stores.some(s => s.error() !== null);
+    const allFailed = stores.every(s => s.error() !== null);
     const isLoading = stores.some(s => s.loading());
     const hasData = stores.some(s => s.data().length > 0);
-    if (hasError) return 'error' as const;
+    if (allFailed) return 'error' as const;
     if (!hasData && isLoading) return 'connecting' as const;
     return 'connected' as const;
   });

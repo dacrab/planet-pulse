@@ -14,7 +14,7 @@ export interface PollingStore<T> extends StoreState<T> {
 
 export interface FilterState {
   sources: Set<EventSource>;
-  timeRange: number;
+  timeRange: number | null;
   searchQuery: string;
 }
 

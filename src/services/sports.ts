@@ -9,7 +9,7 @@ export async function fetchSports(): Promise<SportsEvent[]> {
   return data.events.slice(0, 10).map((e: any) => ({
     id: e.idEvent,
     source: 'sports' as const,
-    timestamp: e.strTimestamp ? new Date(e.strTimestamp + 'Z').getTime() : new Date(e.dateEvent).getTime(),
+    timestamp: Date.now(),
     event_name: e.strEvent,
     home_team: e.strHomeTeam,
     away_team: e.strAwayTeam,

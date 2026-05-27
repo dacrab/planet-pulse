@@ -18,7 +18,7 @@ function weatherCondition(code: number): string {
 }
 
 export async function fetchWeather(): Promise<WeatherEvent[]> {
-  return Promise.all(CITIES.map(async city => {
+  const results = await Promise.allSettled(CITIES.map(async city => {
     const res = await fetchWithTimeout(`${API_CONFIG.weather.url}?latitude=${city.lat}&longitude=${city.lon}&current_weather=true`);
     const data = await res.json();
     return {
@@ -30,6 +30,7 @@ export async function fetchWeather(): Promise<WeatherEvent[]> {
       condition: weatherCondition(data.current_weather.weathercode),
       lat: city.lat,
       lon: city.lon,
-    };
+    } satisfies WeatherEvent;
   }));
+  return results.filter(r => r.status === 'fulfilled').map(r => (r as PromiseFulfilledResult<WeatherEvent>).value);
 }
