@@ -1,5 +1,5 @@
 import { createMemo, Accessor } from 'solid-js';
-import { Event, EarthquakeEvent, CryptoEvent, NewsEvent } from '../types/events';
+import { Event } from '../types/events';
 import { getRecentEvents, calculateEventScore } from '../utils/formatters';
 
 export function createInsightsStore(allEvents: Accessor<Event[]>) {
@@ -15,13 +15,17 @@ export function createInsightsStore(allEvents: Accessor<Event[]>) {
     const { event } = best;
     let description = '';
     if (event.source === 'earthquake') {
-      const eq = event as EarthquakeEvent;
-      description = `M${eq.magnitude} earthquake in ${eq.place}`;
+      description = `M${event.magnitude} earthquake in ${event.place}`;
     } else if (event.source === 'crypto') {
-      const c = event as CryptoEvent;
-      description = `${c.symbol} ${c.change_24h > 0 ? 'up' : 'down'} ${Math.abs(c.change_24h).toFixed(1)}% in 24h`;
+      description = `${event.symbol} ${event.change_24h > 0 ? 'up' : 'down'} ${Math.abs(event.change_24h).toFixed(1)}% in 24h`;
     } else if (event.source === 'news') {
-      description = (event as NewsEvent).title;
+      description = event.title;
+    } else if (event.source === 'space') {
+      description = `ISS at ${event.altitude.toLocaleString()} km altitude, ${event.velocity.toLocaleString()} km/h`;
+    } else if (event.source === 'weather') {
+      description = `${event.condition} in ${event.location} at ${event.temperature.toFixed(0)}°C`;
+    } else if (event.source === 'sports') {
+      description = `${event.home_team} vs ${event.away_team} (${event.league})`;
     }
 
     return { event, description, score: best.score };

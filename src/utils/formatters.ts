@@ -1,4 +1,4 @@
-import { Event, EarthquakeEvent, CryptoEvent } from '../types/events';
+import { Event } from '../types/events';
 
 export function formatTimestamp(timestamp: number, now = Date.now()): string {
   const diff = Math.max(0, now - timestamp);
@@ -23,8 +23,8 @@ export function getRecentEvents<T extends { timestamp: number }>(events: T[], mi
 }
 
 export function calculateEventScore(event: Event): number {
-  if (event.source === 'earthquake') return Math.min(100, (event as EarthquakeEvent).magnitude * 15);
-  if (event.source === 'crypto') return Math.min(100, Math.abs((event as CryptoEvent).change_24h) * 10);
+  if (event.source === 'earthquake') return Math.min(100, event.magnitude * 15);
+  if (event.source === 'crypto') return Math.min(100, Math.abs(event.change_24h) * 10);
   if (event.source === 'news') return 30;
   return 20;
 }

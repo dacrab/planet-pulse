@@ -1,9 +1,18 @@
+import { API_CONFIG } from '../config/api';
 import { SpaceEvent } from '../types/events';
 import { fetchWithTimeout } from './base';
 
+interface SpaceItem {
+  timestamp: number;
+  latitude: number;
+  longitude: number;
+  altitude: number;
+  velocity: number;
+}
+
 export async function fetchSpace(): Promise<SpaceEvent[]> {
-  const res = await fetchWithTimeout('https://api.wheretheiss.at/v1/satellites/25544');
-  const data = await res.json();
+  const res = await fetchWithTimeout(API_CONFIG.space.url);
+  const data: SpaceItem = await res.json();
   return [{
     id: `iss-${Date.now()}`,
     source: 'space' as const,

@@ -1,4 +1,4 @@
-import { Index, Show, createEffect, createSignal } from 'solid-js';
+import { Index, Show, createEffect, createSignal, onCleanup } from 'solid-js';
 import { createMemo } from 'solid-js';
 import { useStore } from '../stores/context';
 import { CryptoEvent } from '../types/events';
@@ -12,7 +12,8 @@ function FlashRow(props: { coin: CryptoEvent }) {
     if (price !== prev) {
       prev = price;
       setCls('flash');
-      setTimeout(() => setCls(''), 400);
+      const timer = setTimeout(() => setCls(''), 400);
+      onCleanup(() => clearTimeout(timer));
     }
   });
 
@@ -35,7 +36,7 @@ export function CryptoPanel() {
   const { aggregator } = useStore();
 
   const movers = createMemo(() => {
-    const coins = aggregator.allEvents().filter(e => e.source === 'crypto') as CryptoEvent[];
+    const coins = aggregator.allEvents().filter((e): e is CryptoEvent => e.source === 'crypto');
     return [...coins].sort((a, b) => Math.abs(b.change_24h) - Math.abs(a.change_24h)).slice(0, 8);
   });
 

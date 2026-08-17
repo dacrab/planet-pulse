@@ -10,7 +10,7 @@ interface USGSFeature {
 
 export async function fetchEarthquakes(): Promise<EarthquakeEvent[]> {
   const res = await fetchWithTimeout(API_CONFIG.earthquake.url);
-  const data = await res.json();
+  const data: { features: USGSFeature[] } = await res.json();
   return data.features.map((f: USGSFeature) => ({
     id: f.id,
     source: 'earthquake' as const,

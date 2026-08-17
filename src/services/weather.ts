@@ -9,6 +9,10 @@ const CITIES = [
   { name: 'Sydney',   lat: -33.8688, lon: 151.2093 },
 ];
 
+interface WeatherItem {
+  current_weather: { temperature: number; weathercode: number };
+}
+
 function weatherCondition(code: number): string {
   if (code === 0) return 'Clear';
   if (code <= 3)  return 'Cloudy';
@@ -20,9 +24,9 @@ function weatherCondition(code: number): string {
 export async function fetchWeather(): Promise<WeatherEvent[]> {
   const results = await Promise.allSettled(CITIES.map(async city => {
     const res = await fetchWithTimeout(`${API_CONFIG.weather.url}?latitude=${city.lat}&longitude=${city.lon}&current_weather=true`);
-    const data = await res.json();
+    const data: WeatherItem = await res.json();
     return {
-      id: `weather-${city.name}-${Date.now()}`,
+      id: `weather-${city.name}`,
       source: 'weather' as const,
       timestamp: Date.now(),
       location: city.name,

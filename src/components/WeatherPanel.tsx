@@ -10,7 +10,7 @@ const conditionIcon: Record<string, string> = {
 export function WeatherPanel() {
   const { aggregator } = useStore();
   const cities = createMemo(() =>
-    aggregator.allEvents().filter(e => e.source === 'weather') as WeatherEvent[]
+    aggregator.allEvents().filter((e): e is WeatherEvent => e.source === 'weather')
   );
 
   return (

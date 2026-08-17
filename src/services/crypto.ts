@@ -1,3 +1,4 @@
+import { API_CONFIG } from '../config/api';
 import { CryptoEvent } from '../types/events';
 import { fetchWithTimeout } from './base';
 
@@ -8,7 +9,12 @@ const SYMBOLS = [
   'DOTUSDT','LINKUSDT','LTCUSDT','UNIUSDT','ATOMUSDT',
   'NEARUSDT','SUIUSDT','APTUSDT','FILUSDT','MATICUSDT',
 ];
-const URL = `https://data-api.binance.vision/api/v3/ticker/24hr?symbols=${encodeURIComponent(JSON.stringify(SYMBOLS))}`;
+
+interface CryptoItem {
+  symbol: string;
+  lastPrice: string;
+  priceChangePercent: string;
+}
 
 const NAMES: Record<string, string> = {
   BTC:'Bitcoin', ETH:'Ethereum', BNB:'BNB', SOL:'Solana', XRP:'XRP',
@@ -18,8 +24,9 @@ const NAMES: Record<string, string> = {
 };
 
 export async function fetchCrypto(): Promise<CryptoEvent[]> {
-  const res = await fetchWithTimeout(URL);
-  const data: any[] = await res.json();
+  const url = `${API_CONFIG.crypto.url}?symbols=${encodeURIComponent(JSON.stringify(SYMBOLS))}`;
+  const res = await fetchWithTimeout(url);
+  const data: CryptoItem[] = await res.json();
   return data.map(t => {
     const symbol = t.symbol.replace('USDT', '');
     return {
