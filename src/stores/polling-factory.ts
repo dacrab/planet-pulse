@@ -27,7 +27,7 @@ export function createPollingStore<T>(fetchFn: () => Promise<T[]>, interval: num
   const subscribe = () => {
     if (intervalId !== null) return;
     poll();
-    intervalId = setInterval(poll, interval) as unknown as number;
+    intervalId = setInterval(poll, interval);
   };
 
   const unsubscribe = () => {

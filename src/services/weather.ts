@@ -36,5 +36,7 @@ export async function fetchWeather(): Promise<WeatherEvent[]> {
       lon: city.lon,
     } satisfies WeatherEvent;
   }));
-  return results.filter(r => r.status === 'fulfilled').map(r => (r as PromiseFulfilledResult<WeatherEvent>).value);
+  return results
+    .filter((r): r is PromiseFulfilledResult<WeatherEvent> => r.status === 'fulfilled')
+    .map(r => r.value);
 }

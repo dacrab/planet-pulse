@@ -14,8 +14,8 @@ interface SportsItem {
 function isSportsItem(e: unknown): e is SportsItem {
   return (
     typeof e === 'object' && e !== null &&
-    typeof (e as SportsItem).idEvent === 'string' &&
-    typeof (e as SportsItem).strEvent === 'string'
+    'idEvent' in e && typeof e.idEvent === 'string' &&
+    'strEvent' in e && typeof e.strEvent === 'string'
   );
 }
 
