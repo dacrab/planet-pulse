@@ -19,13 +19,15 @@ bun run preview
 | Route | What it is |
 | --- | --- |
 | `/` | Overview: world map, top event, feed status, three domain panels, latest events |
-| `/feed` | Searchable, filterable, paged timeline across every source |
+| `/feed` | Searchable, filterable, paged timeline across every source; `?source=` narrows to one feed and `?q=` pre-fills the search |
 | `/sources` | Per-source health, latency, cadence and sparklines |
 | `/sources/:source` | Detail view for one feed with its own search |
 | `/intelligence` | Derived cross-source correlations, alerts, range checks and method |
 | `*` | 404 |
 
 Open an event from anywhere and the drawer is encoded in the URL (`?event=…`), so it can be linked and survives reloads.
+
+The overview map zooms from 1× to 4× with the wheel, trackpad pinch or the `+`, `−`, `0` keys. Drag or use the arrow keys to pan, double-click to zoom in, and click the percentage readout to reset. Marker sizes, label type and stroke widths counter-scale with zoom so the map reveals detail without turning markers into oversized blobs.
 
 ## Data sources
 
@@ -83,6 +85,8 @@ The old layered stores/services/config split was replaced with one provider that
 ## Design
 
 A flat instrument-panel look: warm paper and charcoal surfaces, one safety-orange accent, Archivo for display and UI type, and IBM Plex Mono for data. Panels are square-edged and divided by hairline borders instead of shadows or glass. The world map is generated offline from Natural Earth 110m land polygons and drawn as a single SVG path. Motion respects `prefers-reduced-motion`.
+
+Clicking one of the six monitored cities opens a place sheet with current conditions, the nearest located earthquake and its distance, the ISS straight-line distance, and headlines that mention the city. Weather, quake and orbit data are live; headline mentions are approximate text matches because the news endpoint has no structured place metadata. The sheet can zoom the map to the city or open the event log filtered by its name.
 
 ## License
 

@@ -2,7 +2,7 @@ import { onMount } from 'solid-js';
 import { useSearchParams } from '@solidjs/router';
 import { Meta, Title } from '@solidjs/meta';
 import { usePulse } from '../stores/pulse';
-import { SOURCE_BY_ID } from '../data/sources';
+import { SOURCES, SOURCE_BY_ID } from '../data/sources';
 import type { SourceId } from '../types';
 import { FilterBar } from '../components/FilterBar';
 import { PagedEventList } from '../components/PagedEventList';
@@ -12,18 +12,25 @@ import { Panel } from '../components/UI';
 
 export default function Feed() {
   const pulse = usePulse();
-  const [params] = useSearchParams<{ source?: string }>();
+  const [params] = useSearchParams<{ source?: string; q?: string }>();
 
   onMount(() => {
-    const source = params.source;
-    if (typeof source === 'string' && SOURCE_BY_ID[source as SourceId]) {
-      pulse.setFilters({
-        sources: [source as SourceId],
-        query: '',
-        window: null,
-        kind: 'all',
-      });
-    }
+    const sourceParam = params.source;
+    const source =
+      typeof sourceParam === 'string' &&
+      SOURCE_BY_ID[sourceParam as SourceId]
+        ? (sourceParam as SourceId)
+        : null;
+    const query = typeof params.q === 'string' ? params.q.trim() : '';
+
+    if (!source && !query) return;
+
+    pulse.setFilters({
+      sources: source ? [source] : SOURCES.map((item) => item.id),
+      query,
+      window: null,
+      kind: 'all',
+    });
   });
 
   const resetKey = () =>
