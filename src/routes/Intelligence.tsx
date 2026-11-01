@@ -121,19 +121,16 @@ export default function Intelligence() {
       <Title>Intelligence — Planet Pulse</Title>
       <Meta
         name="description"
-        content="Cross-signal correlations and tiered alerts derived from the live Planet Pulse feeds."
+        content="Cross-source correlations and tiered alerts derived from the live Planet Pulse feeds."
       />
 
-      <div class="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+      <header class="flex flex-wrap items-end justify-between gap-4 border-b border-line pb-4">
         <div>
           <p class="eyebrow text-faint">Intelligence</p>
-          <h1 class="display mt-2 text-4xl leading-[0.95] tracking-tight sm:text-5xl">
-            Read between <em class="text-accent">the feeds.</em>
-          </h1>
+          <h1 class="display mt-1 text-3xl text-ink">Alerts and correlations</h1>
           <p class="mt-2 max-w-xl text-xs leading-relaxed text-muted">
-            Alerts are derived, not hand-written. Three transparent heuristics
-            compare sources and score the overlap. You can dismiss anything that
-            is not useful.
+            Three fixed rules compare sources and score the overlap. Alerts are
+            suggestions, not predictions. Dismiss anything that is not useful.
           </p>
         </div>
 
@@ -142,13 +139,13 @@ export default function Intelligence() {
           <MiniStat value={watchlist().length} label="watchlist" />
           <MiniStat value={pulse.dismissed().length} label="dismissed" />
         </div>
-      </div>
+      </header>
 
       <div class="mt-6 grid gap-4 lg:grid-cols-12">
         <div class="lg:col-span-8">
           <Panel
             eyebrow="Alerts"
-            title="Above the line"
+            title="Active alerts"
             action={
               <span class="font-mono text-[9px] uppercase tracking-wider text-faint">
                 action ≥ 75 · watch ≥ 55
@@ -165,7 +162,7 @@ export default function Intelligence() {
                   message={
                     watchlist().length
                       ? 'Nothing has crossed the alert threshold. The watchlist below shows correlations that are still forming.'
-                      : 'No cross-signal overlap is strong enough to flag right now. The method panel explains what is watched.'
+                      : 'No cross-source overlap is strong enough to flag right now. The method panel explains what is watched.'
                   }
                 />
               }
@@ -180,7 +177,7 @@ export default function Intelligence() {
 
           <Panel
             eyebrow="Watchlist"
-            title="Correlations below the line"
+            title="Below alert threshold"
             class="mt-4"
             bodyClass="p-3"
           >
@@ -190,8 +187,8 @@ export default function Intelligence() {
                 <p class="px-2 py-6 text-center text-xs leading-relaxed text-muted">
                   {pulse.activeCorrelations().length === 0
                     ? pulse.correlations().length
-                      ? 'Every current correlation has been dismissed. Use Restore dismissed in the observatory panel.'
-                      : 'No cross-signal correlation is forming right now. The method panel explains what we look for.'
+                      ? 'Every current correlation has been dismissed. Use Restore dismissed below.'
+                      : 'No cross-source correlation is forming right now. The method panel explains what we look for.'
                     : 'Every current correlation has crossed the alert threshold.'}
                 </p>
               }
@@ -199,7 +196,7 @@ export default function Intelligence() {
               <div class="space-y-2">
                 <For each={watchlist()}>
                   {(correlation) => (
-                    <article class="rounded-xl border border-line bg-panel-2/40 p-3">
+                    <article class="rounded border border-line bg-panel-2 p-3">
                       <div class="flex items-center justify-between gap-2">
                         <p class="eyebrow text-[8px] text-faint">
                           {correlation.kind}
@@ -231,7 +228,7 @@ export default function Intelligence() {
 
           <Panel
             eyebrow="Range check"
-            title="How close is close"
+            title="Distances to thresholds"
             class="mt-4"
             bodyClass="p-1"
           >
@@ -277,11 +274,11 @@ export default function Intelligence() {
         </div>
 
         <aside class="flex flex-col gap-4 lg:col-span-4">
-          <Panel eyebrow="Method" title="Three heuristics" bodyClass="p-3">
+          <Panel eyebrow="Method" title="Detection rules" bodyClass="p-3">
             <div class="space-y-2">
               <For each={METHOD}>
                 {(method) => (
-                  <div class="rounded-xl border border-line bg-panel-2/40 p-3">
+                  <div class="rounded border border-line bg-panel-2 p-3">
                     <div class="flex items-center gap-2">
                       <span class="text-accent">
                         <Icon name={method.icon} size={15} />
@@ -301,7 +298,7 @@ export default function Intelligence() {
               </For>
             </div>
 
-            <div class="mt-3 rounded-xl border border-line bg-panel-2/40 p-3">
+            <div class="mt-3 rounded border border-line bg-panel-2 p-3">
               <p class="eyebrow text-[8px] text-faint">Scoring</p>
               <p class="mt-1 text-[10px] leading-relaxed text-muted">
                 Significance is a 0–100 blend of the source values and the
@@ -312,7 +309,7 @@ export default function Intelligence() {
           </Panel>
 
           <Panel
-            eyebrow="Observatory"
+            eyebrow="System"
             title="Feed status"
             action={
               <SourceStatusPill
@@ -331,11 +328,11 @@ export default function Intelligence() {
                 online={pulse.online()}
               />
             }
-            bodyClass="p-5"
+            bodyClass="p-4"
           >
             <p class="text-[11px] leading-relaxed text-muted">
-              {pulse.events().length} signals from six sources. Last
-              synchronised {pulse.lastUpdateLabel()}.
+              {pulse.events().length} items from six sources. Last synced{' '}
+              {pulse.lastUpdateLabel()}.
             </p>
             <div class="mt-4 flex items-center gap-2">
               <Button size="sm" variant="outline" onClick={pulse.refreshAll}>
@@ -372,9 +369,9 @@ function RangeRow(props: {
   detail: string;
 }) {
   return (
-    <div class="flex items-center gap-3 rounded-xl px-2 py-2.5">
+    <div class="flex items-center gap-3 rounded px-2 py-2.5">
       <span
-        class="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg border border-line"
+        class="flex h-7 w-7 shrink-0 items-center justify-center rounded border border-line"
         style={{
           color: props.color,
           'background-color': `color-mix(in srgb, ${props.color} 8%, transparent)`,

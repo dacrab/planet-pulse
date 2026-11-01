@@ -18,7 +18,7 @@ const WINDOWS: Array<{ value: number | null; label: string }> = [
 const KINDS: Array<{ value: 'all' | 'event' | 'signal'; label: string }> = [
   { value: 'all', label: 'All' },
   { value: 'event', label: 'Events' },
-  { value: 'signal', label: 'Signals' },
+  { value: 'signal', label: 'Readings' },
 ];
 
 export function FilterBar() {
@@ -57,7 +57,7 @@ export function FilterBar() {
     ALL_SOURCES.some((id) => !pulse.filters.sources.includes(id));
 
   return (
-    <div class="sticky top-16 z-30 -mx-4 border-y border-line bg-bg/85 px-4 py-3 backdrop-blur-xl sm:-mx-6 sm:px-6">
+    <div class="sticky top-16 z-30 -mx-4 border-y border-line bg-bg px-4 py-3 sm:-mx-6 sm:px-6">
       <div class="flex flex-col gap-2.5">
         <div class="flex items-center gap-2">
           <div class="relative min-w-0 flex-1">
@@ -76,13 +76,13 @@ export function FilterBar() {
               onInput={(event) =>
                 pulse.setFilters('query', event.currentTarget.value)
               }
-              placeholder="Search the wire — places, assets, teams…"
-              class="focus-ring h-9 w-full rounded-xl border border-line bg-panel-2/70 pl-9 pr-9 text-[13px] text-ink placeholder:text-faint"
+              placeholder="Search events, places, assets, teams…"
+              class="focus-ring h-9 w-full rounded border border-line bg-panel-2 pl-9 pr-9 text-[13px] text-ink placeholder:text-faint"
             />
             <Show when={pulse.filters.query}>
               <button
                 type="button"
-                class="focus-ring absolute right-2 top-1/2 flex h-6 w-6 -translate-y-1/2 items-center justify-center rounded-md text-faint hover:bg-line/60 hover:text-ink"
+                class="focus-ring absolute right-2 top-1/2 flex h-6 w-6 -translate-y-1/2 items-center justify-center rounded-sm text-faint hover:bg-line/60 hover:text-ink"
                 onClick={() => pulse.setFilters('query', '')}
                 aria-label="Clear search"
               >
@@ -91,15 +91,15 @@ export function FilterBar() {
             </Show>
           </div>
 
-          <div class="hidden h-9 items-center gap-1 rounded-xl border border-line bg-panel-2/60 p-0.5 sm:flex">
+          <div class="hidden h-9 items-center gap-1 rounded border border-line bg-panel-2 p-0.5 sm:flex">
             <For each={KINDS}>
               {(kind) => (
                 <button
                   type="button"
                   onClick={() => start(() => pulse.setFilters('kind', kind.value))}
-                  class="focus-ring h-8 rounded-lg px-2.5 text-[11px] font-medium text-faint transition-colors hover:text-ink"
+                  class="focus-ring h-8 rounded-sm px-2.5 text-[11px] font-medium text-faint transition-colors hover:text-ink"
                   classList={{
-                    'bg-panel text-ink shadow-sm': pulse.filters.kind === kind.value,
+                    'bg-panel text-ink': pulse.filters.kind === kind.value,
                   }}
                   aria-pressed={pulse.filters.kind === kind.value}
                 >
@@ -121,10 +121,10 @@ export function FilterBar() {
                 )
               )
             }
-            aria-label={`Sort by ${pulse.filters.sort === 'newest' ? 'impact' : 'newest'}`}
+            aria-label={`Sort by ${pulse.filters.sort === 'newest' ? 'priority' : 'newest'}`}
           >
             <Icon name="sliders" size={13} />
-            {pulse.filters.sort === 'newest' ? 'Newest' : 'Impact'}
+            {pulse.filters.sort === 'newest' ? 'Newest' : 'Priority'}
           </Button>
 
           <Show when={isDirty()}>
@@ -150,7 +150,7 @@ export function FilterBar() {
                 )
               )
             }
-            class="focus-ring h-7 shrink-0 rounded-full border border-line px-2.5 text-[10px] font-medium text-muted transition-colors hover:border-line-strong hover:text-ink"
+            class="focus-ring h-7 shrink-0 rounded border border-line px-2.5 text-[10px] font-medium text-muted transition-colors hover:border-line-strong hover:text-ink"
             aria-pressed={pulse.filters.sources.length === ALL_SOURCES.length}
           >
             All
@@ -163,7 +163,7 @@ export function FilterBar() {
                 <button
                   type="button"
                   onClick={() => toggleSource(source.id)}
-                  class="source-chip focus-ring flex h-7 shrink-0 items-center gap-1.5 rounded-full border px-2.5 text-[10px] font-medium transition-colors"
+                  class="source-chip focus-ring flex h-7 shrink-0 items-center gap-1.5 rounded border px-2.5 text-[10px] font-medium transition-colors"
                   classList={{ 'is-active': active() }}
                   style={{ '--chip': source.color }}
                   aria-pressed={active()}
@@ -193,7 +193,7 @@ export function FilterBar() {
                     )
                   )
                 }
-                class="focus-ring h-7 shrink-0 rounded-full border px-2.5 text-[10px] font-medium transition-colors"
+                class="focus-ring h-7 shrink-0 rounded border px-2.5 text-[10px] font-medium transition-colors"
                 classList={{
                   'border-line': pulse.filters.window !== window.value,
                   'text-faint': pulse.filters.window !== window.value,

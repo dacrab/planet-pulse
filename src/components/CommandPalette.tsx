@@ -22,7 +22,7 @@ interface Command {
   label: string;
   hint: string;
   icon: IconName;
-  group: 'Navigate' | 'Sources' | 'Actions' | 'Signals';
+  group: 'Navigate' | 'Sources' | 'Actions' | 'Events';
   run: () => void;
 }
 
@@ -45,15 +45,15 @@ export function CommandPalette() {
       {
         id: 'nav-overview',
         label: 'Overview',
-        hint: 'Planetary view, vitals and the brief',
+        hint: 'Map, feed status and summary',
         icon: 'globe',
         group: 'Navigate',
         run: run(() => navigate('/')),
       },
       {
-        id: 'nav-wire',
-        label: 'The wire',
-        hint: 'Search and filter the live feed',
+        id: 'nav-feed',
+        label: 'Event log',
+        hint: 'Search and filter all events',
         icon: 'feed',
         group: 'Navigate',
         run: run(() => navigate('/feed')),
@@ -61,7 +61,7 @@ export function CommandPalette() {
       {
         id: 'nav-sources',
         label: 'Sources',
-        hint: 'Inspect all six live feeds',
+        hint: 'Inspect all six public feeds',
         icon: 'layers',
         group: 'Navigate',
         run: run(() => navigate('/sources')),
@@ -77,7 +77,7 @@ export function CommandPalette() {
       {
         id: 'action-theme',
         label: `Switch to ${pulse.theme() === 'dark' ? 'light' : 'dark'} theme`,
-        hint: 'Change the observatory lighting',
+        hint: 'Toggle light or dark',
         icon: pulse.theme() === 'dark' ? 'sun' : 'moon',
         group: 'Actions',
         run: run(pulse.toggleTheme),
@@ -115,11 +115,11 @@ export function CommandPalette() {
     );
   });
 
-  const signals = createMemo<Command[]>(() => {
+  const eventResults = createMemo<Command[]>(() => {
     const search = deferredQuery().trim().toLowerCase();
-    const events = pulse.events();
+    const all = pulse.events();
     const pool = search
-      ? events.filter((event) => event.search.includes(search))
+      ? all.filter((event) => event.search.includes(search))
       : pulse.top()
         ? [pulse.top()!]
         : [];
@@ -131,13 +131,13 @@ export function CommandPalette() {
         label: event.title,
         hint: `${source.label} · ${event.subtitle}`,
         icon: source.icon,
-        group: 'Signals',
+        group: 'Events',
         run: () => pulse.openEvent(event.id),
       };
     });
   });
 
-  const results = createMemo<Command[]>(() => [...commands(), ...signals()]);
+  const results = createMemo<Command[]>(() => [...commands(), ...eventResults()]);
 
   createEffect(() => {
     if (!pulse.commandOpen()) return;
@@ -176,14 +176,14 @@ export function CommandPalette() {
     <Show when={pulse.commandOpen()}>
       <Portal>
         <div
-          class="fixed inset-0 z-[70] flex items-start justify-center bg-black/45 px-4 pt-[10vh] backdrop-blur-sm sm:pt-[14vh]"
+          class="fixed inset-0 z-[70] flex items-start justify-center bg-black/55 px-4 pt-[10vh] sm:pt-[14vh]"
           onClick={(event) => {
             if (event.target === event.currentTarget) close();
           }}
           role="presentation"
         >
           <div
-            class="palette-panel w-full max-w-xl overflow-hidden rounded-2xl border border-line-strong bg-panel shadow-2xl"
+            class="palette-panel w-full max-w-xl overflow-hidden rounded border border-line-strong bg-panel"
             role="dialog"
             aria-modal="true"
             aria-label="Command palette"
@@ -212,7 +212,7 @@ export function CommandPalette() {
                 placeholder="Search events, sources, actions…"
                 class="h-14 w-full bg-transparent text-sm text-ink outline-none placeholder:text-faint"
                 use:focus
-                aria-label="Search commands and signals"
+                aria-label="Search commands and events"
               />
               <Kbd>esc</Kbd>
             </div>
@@ -248,14 +248,14 @@ export function CommandPalette() {
                         aria-selected={active() === index()}
                         onMouseEnter={() => setActive(index())}
                         onClick={command.run}
-                        class="focus-ring flex w-full items-center gap-3 rounded-xl px-2.5 py-2 text-left transition-colors"
+                        class="focus-ring flex w-full items-center gap-3 rounded px-2.5 py-2 text-left transition-colors"
                         classList={{
                           'bg-panel-2': active() === index(),
-                          'hover:bg-panel-2/60': active() !== index(),
+                          'hover:bg-panel-2': active() !== index(),
                         }}
                       >
                         <span
-                          class="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-line bg-panel text-faint"
+                          class="flex h-8 w-8 shrink-0 items-center justify-center rounded border border-line bg-panel text-faint"
                           classList={{ 'text-accent': active() === index() }}
                         >
                           <Icon name={command.icon} size={15} />
@@ -278,7 +278,7 @@ export function CommandPalette() {
               </Show>
             </div>
 
-            <div class="flex items-center gap-3 border-t border-line bg-panel-2/40 px-4 py-2.5 font-mono text-[9px] uppercase tracking-wider text-faint">
+            <div class="flex items-center gap-3 border-t border-line bg-panel-2 px-4 py-2.5 font-mono text-[9px] uppercase tracking-wider text-faint">
               <span class="flex items-center gap-1.5">
                 <Kbd>↑</Kbd>
                 <Kbd>↓</Kbd>

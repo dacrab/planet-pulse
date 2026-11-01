@@ -27,23 +27,21 @@ export default function Sources() {
         content="Health, cadence and raw output for all six Planet Pulse feeds."
       />
 
-      <div class="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+      <header class="flex flex-wrap items-end justify-between gap-4 border-b border-line pb-4">
         <div>
-          <p class="eyebrow text-faint">Sources</p>
-          <h1 class="display mt-2 text-4xl leading-[0.95] tracking-tight sm:text-5xl">
-            Six feeds. <em class="text-accent">One pulse.</em>
-          </h1>
+          <p class="eyebrow text-faint">Public endpoints</p>
+          <h1 class="display mt-1 text-3xl text-ink">Sources</h1>
           <p class="mt-2 max-w-xl text-xs leading-relaxed text-muted">
-            Each source polls independently, fails independently and is refreshed
-            independently. No API keys, no proxy, no hidden backend.
+            Six independent feeds. Each polls, fails and refreshes on its own.
+            No API keys, no proxy, no backend.
           </p>
         </div>
         <div class="flex gap-5">
           <MiniStat value={`${healthy()}/6`} label="healthy" />
-          <MiniStat value={pulse.events().length} label="signals" />
+          <MiniStat value={pulse.events().length} label="items" />
           <MiniStat value={pulse.lastUpdateLabel()} label="last sync" />
         </div>
-      </div>
+      </header>
 
       <div class="mt-6 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
         <For each={SOURCES}>
@@ -64,7 +62,7 @@ export default function Sources() {
               >
                 <div class="flex items-start justify-between gap-3">
                   <span
-                    class="flex h-9 w-9 items-center justify-center rounded-xl border border-line"
+                    class="flex h-9 w-9 items-center justify-center rounded border border-line"
                     style={{
                       color: source.color,
                       'background-color': `color-mix(in srgb, ${source.color} 9%, transparent)`,
@@ -99,7 +97,7 @@ export default function Sources() {
                     <p class="display text-3xl leading-none text-ink">
                       {pulse.counts()[source.id]}
                     </p>
-                    <p class="eyebrow mt-1 text-[8px] text-faint">signals</p>
+                    <p class="eyebrow mt-1 text-[8px] text-faint">items</p>
                   </div>
                   <Sparkline
                     values={values()}
@@ -118,12 +116,14 @@ export default function Sources() {
                       ? timeAgoLabel(runtime().fetchedAt(), pulse.now())
                       : 'waiting'}
                   </span>
-                  <span class="text-right">{source.kind}</span>
+                  <span class="text-right">
+                    {source.kind === 'signal' ? 'reading' : 'event'}
+                  </span>
                 </div>
 
                 <Show when={runtime().error()}>
                   {(error) => (
-                    <div class="mt-3 rounded-lg border border-danger/20 bg-danger/5 px-2.5 py-2 text-[10px] leading-relaxed text-danger">
+                    <div class="mt-3 rounded border border-danger/20 bg-danger/5 px-2.5 py-2 text-[10px] leading-relaxed text-danger">
                       {error()}
                     </div>
                   )}
@@ -132,7 +132,7 @@ export default function Sources() {
                 <div class="mt-4 flex items-center gap-2">
                   <A
                     href={`/sources/${source.id}`}
-                    class="focus-ring inline-flex h-8 items-center justify-center gap-1.5 rounded-lg border border-line px-2.5 text-[11px] font-medium text-ink transition-colors hover:border-line-strong hover:bg-panel-2"
+                    class="focus-ring inline-flex h-8 items-center justify-center gap-1.5 rounded border border-line px-2.5 text-[11px] font-medium text-ink transition-colors hover:border-line-strong hover:bg-panel-2"
                   >
                     Inspect <Icon name="arrow-right" size={12} />
                   </A>
@@ -161,7 +161,7 @@ export default function Sources() {
 
       <Panel
         eyebrow="Data"
-        title="How the plumbing works"
+        title="How it works"
         class="mt-4"
         bodyClass="p-5"
       >
@@ -176,7 +176,7 @@ export default function Sources() {
           />
           <Info
             title="Visibility aware"
-            text="Polling pauses when the tab is hidden, when you pause the observatory, or when the browser goes offline."
+            text="Polling pauses when the tab is hidden, when you pause the feeds, or when the browser goes offline."
           />
         </div>
 
@@ -187,7 +187,7 @@ export default function Sources() {
                 href={source.docs}
                 target="_blank"
                 rel="noopener noreferrer"
-                class="focus-ring inline-flex items-center gap-1.5 rounded-full border border-line bg-panel-2 px-2.5 py-1 font-mono text-[9px] uppercase tracking-wider text-muted transition-colors hover:border-line-strong hover:text-ink"
+                class="focus-ring inline-flex items-center gap-1.5 rounded border border-line bg-panel-2 px-2.5 py-1 font-mono text-[9px] uppercase tracking-wider text-muted transition-colors hover:border-line-strong hover:text-ink"
               >
                 {source.label}
                 <Icon name="external" size={10} />

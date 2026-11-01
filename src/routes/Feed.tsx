@@ -37,40 +37,38 @@ export default function Feed() {
 
   return (
     <>
-      <Title>The wire — Planet Pulse</Title>
+      <Title>Event log — Planet Pulse</Title>
       <Meta
         name="description"
-        content="Every live signal in one searchable, filterable feed."
+        content="Every live event and reading in one searchable, filterable feed."
       />
 
-      <div class="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+      <header class="flex flex-wrap items-end justify-between gap-4 border-b border-line pb-4">
         <div>
-          <p class="eyebrow text-faint">The wire</p>
-          <h1 class="display mt-2 text-4xl leading-[0.95] tracking-tight sm:text-5xl">
-            Every signal, <em class="text-accent">in sequence.</em>
-          </h1>
+          <p class="eyebrow text-faint">All sources</p>
+          <h1 class="display mt-1 text-3xl text-ink">Event log</h1>
           <p class="mt-2 max-w-xl text-xs leading-relaxed text-muted">
-            Continuous observations and discrete events share one timeline.
-            Search across places, assets, teams and headlines.
+            Search and filter every event and reading. Newest first unless you
+            switch to priority.
           </p>
         </div>
         <p class="font-mono text-[9px] uppercase tracking-wider text-faint">
           {pulse.filtered().length} visible · {pulse.events().length} total
         </p>
-      </div>
+      </header>
 
-      <div class="mt-5">
+      <div class="mt-4">
         <FilterBar />
       </div>
 
       <div class="mt-4 grid gap-4 lg:grid-cols-12">
         <div class="lg:col-span-8">
           <Panel
-            eyebrow="Live feed"
-            title="Signals"
+            eyebrow="Live"
+            title="Events"
             action={
               <span class="font-mono text-[9px] uppercase tracking-wider text-faint">
-                {pulse.filters.sort === 'newest' ? 'newest first' : 'impact first'}
+                {pulse.filters.sort === 'newest' ? 'newest first' : 'priority first'}
               </span>
             }
             bodyClass="p-2"

@@ -75,7 +75,7 @@ export interface PulseEvent {
   lat?: number;
   lon?: number;
   place?: string;
-  /** 0–100 editorial significance, used for ranking and the score meter. */
+  /** 0–100 priority score, used for ranking and the score meter. */
   score: number;
   /** Primary numeric value: magnitude, price, temperature, altitude. */
   value?: number;

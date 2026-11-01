@@ -1,6 +1,6 @@
 # Planet Pulse
 
-A live planetary observatory: six public feeds — earthquakes, world news, the ISS, weather, markets and football fixtures — merged into one reactive surface.
+A live world monitor: six public feeds — earthquakes, world news, the ISS, weather, markets and football fixtures — merged into one reactive timeline.
 
 Built as a deliberate showcase of SolidJS. No API keys, no proxy, no backend, no tracking.
 
@@ -18,11 +18,11 @@ bun run preview
 
 | Route | What it is |
 | --- | --- |
-| `/` | Overview: world map, signal of the hour, vitals, three domain panels, live wire |
+| `/` | Overview: world map, top event, feed status, three domain panels, latest events |
 | `/feed` | Searchable, filterable, paged timeline across every source |
 | `/sources` | Per-source health, latency, cadence and sparklines |
 | `/sources/:source` | Detail view for one feed with its own search |
-| `/intelligence` | Derived cross-signal correlations, alerts, range checks and method |
+| `/intelligence` | Derived cross-source correlations, alerts, range checks and method |
 | `*` | 404 |
 
 Open an event from anywhere and the drawer is encoded in the URL (`?event=…`), so it can be linked and survives reloads.
@@ -40,7 +40,7 @@ Every request runs in the browser against a public, CORS-enabled endpoint.
 | Markets | Binance public 24h tickers | 20s |
 | Fixtures | TheSportsDB daily soccer | 15m |
 
-Polling pauses when the tab is hidden, when the observatory is paused, or when the browser is offline. A failed source is isolated: its last data stays visible while the next poll retries.
+Polling pauses when the tab is hidden, when the feeds are paused, or when the browser is offline. A failed source is isolated: its last data stays visible while the next poll retries.
 
 ## SolidJS features used
 
@@ -82,7 +82,7 @@ The old layered stores/services/config split was replaced with one provider that
 
 ## Design
 
-Warm dark and light themes, acid-lime accent, Instrument Serif display type, Inter Tight UI type and JetBrains Mono for data. The world map is generated offline from Natural Earth 110m land polygons and drawn as a single SVG path. Motion respects `prefers-reduced-motion`.
+A flat instrument-panel look: warm paper and charcoal surfaces, one safety-orange accent, Archivo for display and UI type, and IBM Plex Mono for data. Panels are square-edged and divided by hairline borders instead of shadows or glass. The world map is generated offline from Natural Earth 110m land polygons and drawn as a single SVG path. Motion respects `prefers-reduced-motion`.
 
 ## License
 

@@ -28,7 +28,7 @@ export function AlertCard(props: { alert: Alert; compact?: boolean }) {
 
   return (
     <article
-      class="relative overflow-hidden rounded-2xl border p-4"
+      class="relative overflow-hidden rounded border p-4"
       style={{
         'border-color': tier().border,
         'background-color': tier().background,
@@ -42,7 +42,7 @@ export function AlertCard(props: { alert: Alert; compact?: boolean }) {
       <div class="flex items-start justify-between gap-3">
         <div class="min-w-0">
           <p
-            class="font-mono text-[9px] font-medium uppercase tracking-[0.16em]"
+            class="text-[9px] font-semibold uppercase tracking-[0.08em]"
             style={{ color: tier().color }}
           >
             {tier().label} · {props.alert.kind}
@@ -57,7 +57,7 @@ export function AlertCard(props: { alert: Alert; compact?: boolean }) {
         <span
           class="display shrink-0 text-3xl leading-none"
           style={{ color: tier().color }}
-          title="Significance score"
+          title="Score"
         >
           {Math.round(props.alert.significance)}
         </span>

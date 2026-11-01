@@ -69,18 +69,18 @@ export function EventDrawer() {
           <div class="fixed inset-0 z-[60]">
             <button
               type="button"
-              class="absolute inset-0 bg-black/50 backdrop-blur-sm"
+              class="absolute inset-0 bg-black/60"
               onClick={pulse.closeEvent}
               aria-label="Close event details"
             />
 
             <aside
-              class="drawer-panel absolute inset-y-0 right-0 flex w-full max-w-md flex-col overflow-y-auto border-l border-line bg-bg shadow-2xl"
+              class="drawer-panel absolute inset-y-0 right-0 flex w-full max-w-md flex-col overflow-y-auto border-l border-line bg-bg"
               role="dialog"
               aria-modal="true"
               aria-labelledby={titleId}
             >
-              <header class="sticky top-0 z-10 flex items-center justify-between gap-3 border-b border-line bg-bg/90 px-5 py-3.5 backdrop-blur-xl">
+              <header class="sticky top-0 z-10 flex items-center justify-between gap-3 border-b border-line bg-bg px-4 py-3">
                 <div class="flex min-w-0 items-center gap-2">
                   <SourceTag source={selected().source} />
                   <span class="font-mono text-[9px] uppercase tracking-wider text-faint">
@@ -98,7 +98,7 @@ export function EventDrawer() {
                 </Button>
               </header>
 
-              <div class="flex-1 px-5 py-5">
+              <div class="flex-1 px-4 py-4">
                 <div class="flex items-center justify-between gap-3">
                   <p class="eyebrow text-faint">
                     {SOURCE_BY_ID[selected().source].label}
@@ -110,7 +110,7 @@ export function EventDrawer() {
 
                 <h2
                   id={titleId}
-                  class="display mt-2 text-3xl leading-[1.05] tracking-tight text-ink"
+                  class="display mt-2 text-2xl leading-tight text-ink"
                 >
                   {selected().title}
                 </h2>
@@ -129,14 +129,14 @@ export function EventDrawer() {
                     src={selected().image}
                     alt=""
                     loading="lazy"
-                    class="mt-5 aspect-video w-full rounded-xl border border-line object-cover"
+                    class="mt-5 aspect-video w-full rounded border border-line object-cover"
                     onError={(event) => {
                       event.currentTarget.style.display = 'none';
                     }}
                   />
                 </Show>
 
-                <div class="mt-5 grid grid-cols-2 gap-px overflow-hidden rounded-xl border border-line bg-line/60">
+                <div class="mt-5 grid grid-cols-2 gap-px overflow-hidden rounded border border-line bg-line/60">
                   <For each={selected().metrics}>
                     {(metric) => (
                       <div class="bg-panel px-3 py-2.5">
@@ -159,7 +159,7 @@ export function EventDrawer() {
                   <div class="mt-4 flex flex-wrap gap-1.5">
                     <For each={selected().tags}>
                       {(tag) => (
-                        <span class="rounded-full border border-line bg-panel-2 px-2 py-0.5 font-mono text-[9px] uppercase tracking-wider text-faint">
+                        <span class="rounded-sm border border-line bg-panel-2 px-2 py-0.5 font-mono text-[9px] uppercase tracking-wider text-faint">
                           {tag}
                         </span>
                       )}
@@ -178,7 +178,7 @@ export function EventDrawer() {
                     }#map=5/${selected().lat}/${selected().lon}`}
                     target="_blank"
                     rel="noopener noreferrer"
-                    class="focus-ring mt-4 flex items-center gap-2 rounded-xl border border-line px-3 py-2.5 text-[11px] text-muted transition-colors hover:border-line-strong hover:text-ink"
+                    class="focus-ring mt-4 flex items-center gap-2 rounded border border-line px-3 py-2.5 text-[11px] text-muted transition-colors hover:border-line-strong hover:text-ink"
                   >
                     <Icon name="map-pin" size={14} class="text-accent" />
                     <span class="font-mono tabular-nums">
@@ -196,7 +196,7 @@ export function EventDrawer() {
                       href={selected().href}
                       target="_blank"
                       rel="noopener noreferrer"
-                      class="focus-ring inline-flex h-9 items-center justify-center gap-2 rounded-xl bg-accent px-3.5 text-[13px] font-medium text-accent-ink transition-[filter] hover:brightness-105"
+                      class="focus-ring inline-flex h-9 items-center justify-center gap-2 rounded bg-accent px-3.5 text-[13px] font-medium text-accent-ink transition-[filter] hover:brightness-105"
                     >
                       Open original
                       <Icon name="external" size={14} />
@@ -222,7 +222,7 @@ export function EventDrawer() {
               </div>
 
               <Show when={related().length}>
-                <div class="border-t border-line bg-panel/40 px-5 py-4">
+                <div class="border-t border-line bg-panel px-4 py-4">
                   <p class="eyebrow text-[8px] text-faint">More from this source</p>
                   <div class="mt-2">
                     <For each={related()}>

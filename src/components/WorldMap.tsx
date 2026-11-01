@@ -81,15 +81,10 @@ export function WorldMap() {
   };
 
   return (
-    <section class="panel relative flex h-full flex-col overflow-hidden" aria-label="Planetary view">
-      <div class="pointer-events-none absolute inset-0 bg-[radial-gradient(80%_90%_at_50%_10%,color-mix(in_srgb,var(--accent)_5%,transparent),transparent_70%)]" />
-      <div class="pointer-events-none absolute inset-x-0 top-0 z-10 hidden h-32 bg-gradient-to-b from-panel via-panel/90 to-transparent sm:block" />
-
-      <header class="relative z-20 px-4 pb-1 pt-4 sm:absolute sm:left-5 sm:top-5 sm:p-0">
-        <p class="eyebrow text-faint">Planetary view</p>
-        <h2 class="mt-1 display text-2xl leading-none sm:text-3xl">
-          One world. <em class="text-accent">Six signals.</em>
-        </h2>
+    <section class="panel relative flex h-full flex-col overflow-hidden" aria-label="World map">
+      <header class="relative z-20 px-4 pb-2 pt-3 sm:absolute sm:left-4 sm:top-3 sm:p-0">
+        <p class="eyebrow text-faint">World</p>
+        <h2 class="display mt-1 text-xl leading-none text-ink">Live positions</h2>
       </header>
 
       <div class="absolute right-4 top-4 z-20 hidden items-center gap-3 sm:right-5 sm:top-5 sm:flex">
@@ -338,7 +333,7 @@ export function WorldMap() {
         <Show when={hover()}>
           {(item) => (
             <div
-              class="pointer-events-none absolute z-30 w-56 -translate-x-1/2 -translate-y-[calc(100%+14px)] rounded-xl border border-line-strong bg-panel/95 p-3 shadow-xl backdrop-blur-md"
+              class="pointer-events-none absolute z-30 w-56 -translate-x-1/2 -translate-y-[calc(100%+14px)] rounded border border-line-strong bg-panel p-3"
               style={{
                 left: `${(item().x / WORLD_WIDTH) * 100}%`,
                 top: `${(item().y / WORLD_HEIGHT) * 100}%`,
@@ -358,7 +353,7 @@ export function WorldMap() {
         </Show>
       </div>
 
-      <footer class="pointer-events-none absolute inset-x-0 bottom-0 z-20 flex items-end justify-between gap-3 bg-gradient-to-t from-bg/90 to-transparent px-4 pb-3 pt-10 sm:px-5">
+      <footer class="pointer-events-none absolute inset-x-0 bottom-0 z-20 flex items-end justify-between gap-3 border-t border-line bg-panel px-4 py-2 sm:px-4">
         <div class="flex items-center gap-3">
           <span class="flex items-center gap-1.5 font-mono text-[9px] uppercase tracking-wider text-faint">
             <Icon name="activity" size={11} class="text-[var(--src-earthquake)]" />
@@ -385,7 +380,7 @@ function Legend(props: { color: string; label: string }) {
   return (
     <span class="flex items-center gap-1.5 font-mono text-[9px] uppercase tracking-wider text-faint">
       <span
-        class="h-1.5 w-1.5 rounded-full"
+        class="h-1.5 w-1.5 rounded-sm"
         style={{ 'background-color': props.color }}
       />
       {props.label}

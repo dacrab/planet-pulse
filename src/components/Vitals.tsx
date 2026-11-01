@@ -33,10 +33,10 @@ export function Vitals() {
   return (
     <Panel
       eyebrow="Feeds"
-      title="Live vitals"
+      title="Feed status"
       action={
         <span class="font-mono text-[9px] uppercase tracking-wider text-faint">
-          {pulse.events().length} signals
+          {pulse.events().length} items
         </span>
       }
       bodyClass="grid grid-cols-2 gap-1 p-2"
@@ -45,7 +45,7 @@ export function Vitals() {
         {(source) => (
           <A
             href={`/sources/${source.id}`}
-            class="focus-ring group rounded-xl border border-transparent p-2.5 transition-colors hover:border-line hover:bg-panel-2/70"
+            class="focus-ring group rounded border border-transparent p-2.5 transition-colors hover:border-line hover:bg-panel-2"
           >
             <div class="flex items-center justify-between gap-2">
               <SourceDot source={source.id} size={6} />

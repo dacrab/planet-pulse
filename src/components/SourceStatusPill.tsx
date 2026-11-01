@@ -47,7 +47,7 @@ function Pill(props: {
 }) {
   return (
     <span
-      class={`inline-flex items-center gap-1.5 rounded-full border border-line bg-panel-2/60 px-2 py-1 font-mono text-[9px] font-medium uppercase tracking-wider ${props.class ?? ''}`}
+      class={`inline-flex items-center gap-1.5 rounded-sm border border-line bg-panel-2 px-2 py-1 font-mono text-[9px] font-medium uppercase tracking-wider ${props.class ?? ''}`}
     >
       <span
         class={`h-1.5 w-1.5 rounded-full ${props.dot} ${props.pulse ? 'animate-pulse' : ''}`}

@@ -11,7 +11,7 @@ export function IntelligencePreview() {
   return (
     <Panel
       eyebrow="Intelligence"
-      title={pulse.alerts().length ? 'Active alerts' : 'Cross-signal watch'}
+      title={pulse.alerts().length ? 'Active alerts' : 'Watchlist'}
       action={
         <A
           href="/intelligence"
@@ -36,7 +36,7 @@ export function IntelligencePreview() {
               href="/intelligence"
               class="focus-ring mt-3 inline-flex items-center gap-1 rounded font-mono text-[9px] uppercase tracking-wider text-accent"
             >
-              Read the method <Icon name="arrow-right" size={11} />
+              Method <Icon name="arrow-right" size={11} />
             </A>
           </div>
         }

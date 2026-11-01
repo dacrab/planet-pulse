@@ -50,13 +50,13 @@ export function MarketPanel() {
   return (
     <Panel
       eyebrow="Markets"
-      title="Movers"
+      title="Top movers"
       action={
         <A
           href="/sources/crypto"
           class="focus-ring inline-flex items-center gap-1 rounded text-[10px] text-faint transition-colors hover:text-ink"
         >
-          Explore <Icon name="arrow-right" size={12} />
+          Details <Icon name="arrow-right" size={12} />
         </A>
       }
       bodyClass="space-y-0.5 p-2"
@@ -64,11 +64,12 @@ export function MarketPanel() {
       <Show
         when={movers().length}
         fallback={
-          <p class="py-6 text-center text-xs text-muted">Waiting for market data…</p>
+          <p class="py-6 text-center text-xs text-muted">No market data yet.</p>
         }
       >
         <For each={movers()}>
           {(event) => {
+            const symbol = event.title.split(' · ')[0];
             const up = () => (event.delta ?? 0) >= 0;
             const width = () => clamp(Math.abs(event.delta ?? 0) * 4, 3, 50);
 
@@ -76,7 +77,7 @@ export function MarketPanel() {
               <button
                 type="button"
                 onClick={() => pulse.openEvent(event.id)}
-                class="focus-ring group rounded-lg border border-transparent px-2 py-1.5 text-left transition-colors hover:border-line hover:bg-panel-2/70"
+                class="focus-ring group block w-full rounded border border-transparent px-2 py-1.5 text-left transition-colors hover:border-line hover:bg-panel-2"
                 classList={{
                   'flash-up': flash()[event.id] === 'up',
                   'flash-down': flash()[event.id] === 'down',
@@ -85,9 +86,11 @@ export function MarketPanel() {
                 <div class="flex items-center justify-between gap-2">
                   <div class="flex min-w-0 items-center gap-2">
                     <span class="w-10 font-mono text-[10px] font-medium text-ink">
-                      {event.title.split(' · ')[0]}
+                      {symbol}
                     </span>
-                    <span class="truncate text-[10px] text-faint">{event.place}</span>
+                    <span class="truncate text-[10px] text-faint">
+                      {event.place !== symbol ? event.place : ''}
+                    </span>
                   </div>
                   <span
                     class="font-mono text-[10px] tabular-nums"
@@ -104,9 +107,9 @@ export function MarketPanel() {
                   <span class="w-10 shrink-0 text-right font-mono text-[9px] text-muted">
                     ${price(event.value ?? 0)}
                   </span>
-                  <span class="relative h-1 flex-1 rounded-full bg-line/60">
+                  <span class="relative h-1 flex-1 rounded-sm bg-line/60">
                     <span
-                      class="absolute top-0 h-full rounded-full"
+                      class="absolute top-0 h-full rounded-sm"
                       style={{
                         left: up() ? '50%' : `${50 - width()}%`,
                         width: `${width()}%`,

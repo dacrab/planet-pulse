@@ -21,8 +21,8 @@ export function EventRow(props: {
     <button
       type="button"
       onClick={() => pulse.openEvent(props.event.id)}
-      class="focus-ring group grid w-full grid-cols-[2.4rem_1fr_auto] items-start gap-2.5 rounded-xl border border-transparent px-2.5 py-2.5 text-left transition-colors hover:border-line hover:bg-panel-2/70 sm:gap-3 sm:px-3"
-      classList={{ 'border-line bg-panel-2/70': props.selected?.() }}
+      class="focus-ring group grid w-full grid-cols-[2.4rem_1fr_auto] items-start gap-2.5 border-b border-line/60 px-2.5 py-3 text-left transition-colors last:border-b-0 hover:bg-panel-2 sm:gap-3 sm:px-3"
+      classList={{ 'bg-panel-2': props.selected?.() }}
       aria-label={`Open ${props.event.title}`}
     >
       <span
@@ -80,7 +80,7 @@ export function EventList(props: {
       fallback={
         <EmptyState
           icon="search"
-          title={props.emptyTitle ?? 'No signals match'}
+          title={props.emptyTitle ?? 'No events match'}
           message={
             props.emptyMessage ??
             'Try widening the time range, enabling another source, or clearing the search.'
@@ -88,7 +88,7 @@ export function EventList(props: {
         />
       }
     >
-      <div class={`space-y-0.5 ${props.class ?? ''}`}>
+      <div class={props.class ?? ''}>
         <For each={props.events}>
           {(event) => (
             <EventRow event={event} selected={() => isSelected(event.id)} />

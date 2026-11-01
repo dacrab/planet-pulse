@@ -39,14 +39,14 @@ export function Panel(props: PanelProps) {
   return (
     <section class={`panel ${local.class ?? ''}`} {...rest}>
       <Show when={local.eyebrow || local.title || local.action}>
-        <header class="flex items-start justify-between gap-3 border-b border-line/70 px-5 py-3.5">
+        <header class="flex items-start justify-between gap-3 border-b border-line px-4 py-3">
           <div class="min-w-0">
             <Show when={local.eyebrow}>
               <p class="eyebrow text-faint">{local.eyebrow}</p>
             </Show>
             <Show when={local.title}>
               <h2
-                class="text-[13px] font-semibold tracking-tight text-ink"
+                class="text-[12px] font-semibold tracking-tight text-ink"
                 classList={{ 'mt-1': Boolean(local.eyebrow) }}
               >
                 {local.title}
@@ -76,7 +76,7 @@ export interface ButtonProps extends JSX.ButtonHTMLAttributes<HTMLButtonElement>
 }
 
 const BUTTON_VARIANTS: Record<ButtonVariant, string> = {
-  primary: 'bg-accent text-accent-ink hover:brightness-105 shadow-sm',
+  primary: 'bg-accent text-accent-ink hover:brightness-105',
   outline:
     'border border-line-strong bg-transparent text-ink hover:bg-panel-2 hover:border-line-strong',
   ghost: 'text-muted hover:text-ink hover:bg-panel-2',
@@ -85,9 +85,9 @@ const BUTTON_VARIANTS: Record<ButtonVariant, string> = {
 };
 
 const BUTTON_SIZES: Record<ButtonSize, string> = {
-  sm: 'h-8 px-2.5 text-xs rounded-lg',
-  md: 'h-9 px-3.5 text-[13px] rounded-xl',
-  icon: 'h-9 w-9 rounded-xl',
+  sm: 'h-8 px-2.5 text-xs rounded',
+  md: 'h-9 px-3.5 text-[13px] rounded',
+  icon: 'h-9 w-9 rounded',
 };
 
 export function Button(props: ButtonProps) {
@@ -127,7 +127,7 @@ export function SourceTag(props: { source: SourceId; label?: string; class?: str
   const source = () => SOURCE_BY_ID[props.source];
   return (
     <span
-      class={`inline-flex items-center gap-1.5 font-mono text-[9px] font-medium uppercase tracking-[0.14em] ${props.class ?? ''}`}
+      class={`inline-flex items-center gap-1.5 text-[9px] font-semibold uppercase tracking-[0.08em] ${props.class ?? ''}`}
       style={{ color: SOURCE_COLORS[props.source] }}
     >
       <SourceDot source={props.source} size={5} />
@@ -203,14 +203,14 @@ export function ScoreMeter(props: {
   return (
     <div class={`flex items-center gap-2 ${props.class ?? ''}`}>
       <div
-        class="h-1 flex-1 overflow-hidden rounded-full bg-line/80"
+        class="h-1 flex-1 overflow-hidden rounded-sm bg-line/80"
         role="meter"
         aria-valuemin={0}
         aria-valuemax={100}
         aria-valuenow={Math.round(clamp(props.value, 0, 100))}
       >
         <div
-          class="h-full rounded-full transition-[width] duration-500"
+          class="h-full rounded-sm transition-[width] duration-500"
           style={{
             width: `${clamp(props.value, 0, 100)}%`,
             'background-color': props.color ?? 'var(--accent)',
@@ -238,7 +238,7 @@ export function EmptyState(props: {
 }) {
   return (
     <div class="flex flex-col items-center justify-center gap-3 px-6 py-14 text-center">
-      <span class="flex h-11 w-11 items-center justify-center rounded-2xl border border-line bg-panel-2 text-faint">
+      <span class="flex h-11 w-11 items-center justify-center rounded border border-line bg-panel-2 text-faint">
         <Icon name={props.icon ?? 'search'} size={20} />
       </span>
       <div>
@@ -253,12 +253,12 @@ export function EmptyState(props: {
 }
 
 export function Skeleton(props: { class?: string }) {
-  return <div class={`skeleton rounded-xl ${props.class ?? ''}`} aria-hidden="true" />;
+  return <div class={`skeleton rounded ${props.class ?? ''}`} aria-hidden="true" />;
 }
 
 export function Kbd(props: { children: JSX.Element }) {
   return (
-    <kbd class="inline-flex h-5 min-w-5 items-center justify-center rounded border border-line bg-panel-2 px-1 font-mono text-[10px] text-faint">
+    <kbd class="inline-flex h-5 min-w-5 items-center justify-center rounded-sm border border-line bg-panel-2 px-1 font-mono text-[10px] text-faint">
       {props.children}
     </kbd>
   );

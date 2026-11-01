@@ -101,8 +101,8 @@ function Shell(props: { children?: JSX.Element }) {
 function ErrorPanel(props: { error: unknown; reset: () => void }) {
   return (
     <div class="panel mx-auto mt-16 max-w-md p-6 text-center">
-      <p class="eyebrow text-danger">Signal lost</p>
-      <h1 class="display mt-2 text-3xl text-ink">Something broke in the wire.</h1>
+      <p class="eyebrow text-danger">Error</p>
+      <h1 class="display mt-2 text-2xl text-ink">This page failed to load.</h1>
       <p class="mt-2 text-xs leading-relaxed text-muted">
         {props.error instanceof Error ? props.error.message : String(props.error)}
       </p>

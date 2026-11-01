@@ -64,7 +64,7 @@ export default function SourceDetail() {
               <div class="mt-3 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
                 <div class="flex items-start gap-4">
                   <span
-                    class="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border border-line"
+                    class="flex h-12 w-12 shrink-0 items-center justify-center rounded border border-line"
                     style={{
                       color: meta().color,
                       'background-color': `color-mix(in srgb, ${meta().color} 10%, transparent)`,
@@ -73,8 +73,8 @@ export default function SourceDetail() {
                     <Icon name={meta().icon} size={22} />
                   </span>
                   <div>
-                    <p class="eyebrow text-faint">Source</p>
-                    <h1 class="display mt-1 text-4xl leading-none tracking-tight text-ink sm:text-5xl">
+                    <p class="eyebrow text-faint">Feed</p>
+                    <h1 class="display mt-1 text-3xl leading-none text-ink">
                       {meta().label}
                     </h1>
                     <p class="mt-2 max-w-xl text-xs leading-relaxed text-muted">
@@ -109,8 +109,8 @@ export default function SourceDetail() {
               <div class="mt-6 grid gap-4 lg:grid-cols-12">
                 <div class="lg:col-span-8">
                   <Panel
-                    eyebrow={`${meta().kind} feed`}
-                    title={`${events().length} signals`}
+                    eyebrow={`${meta().kind === 'signal' ? 'reading' : 'event'} feed`}
+                    title={`${events().length} events`}
                     action={
                       <div class="relative w-48 max-w-full sm:w-64">
                         <label class="sr-only" for={searchId}>
@@ -129,7 +129,7 @@ export default function SourceDetail() {
                             setQuery(event.currentTarget.value)
                           }
                           placeholder={`Search ${meta().short.toLowerCase()}…`}
-                          class="focus-ring h-8 w-full rounded-lg border border-line bg-panel-2 pl-8 pr-2 text-[11px] text-ink placeholder:text-faint"
+                          class="focus-ring h-8 w-full rounded border border-line bg-panel-2 pl-8 pr-2 text-[11px] text-ink placeholder:text-faint"
                         />
                       </div>
                     }
@@ -146,11 +146,11 @@ export default function SourceDetail() {
                 </div>
 
                 <aside class="flex flex-col gap-4 lg:sticky lg:top-24 lg:col-span-4 lg:self-start">
-                  <Panel eyebrow="Health" title="Feed telemetry" bodyClass="p-5">
+                  <Panel eyebrow="Status" title="Feed telemetry" bodyClass="p-4">
                     <div class="grid grid-cols-2 gap-4">
                       <Metric
                         value={String(pulse.counts()[meta().id])}
-                        label="signals"
+                        label="items"
                       />
                       <Metric
                         value={runtime().latency() ? `${runtime().latency()} ms` : '—'}
@@ -171,7 +171,7 @@ export default function SourceDetail() {
                     </div>
 
                     <div class="mt-5 border-t border-line/60 pt-4">
-                      <p class="eyebrow text-[8px] text-faint">Recent weight</p>
+                      <p class="eyebrow text-[8px] text-faint">Recent scores</p>
                       <Sparkline
                         values={events()
                           .slice(0, 24)
@@ -184,7 +184,7 @@ export default function SourceDetail() {
 
                     <div class="mt-5 border-t border-line/60 pt-4">
                       <div class="flex items-center justify-between text-[11px]">
-                        <span class="text-muted">Average score</span>
+                        <span class="text-muted">Avg score</span>
                         <span class="font-mono tabular-nums text-ink">
                           {Math.round(averageScore())}
                         </span>
@@ -192,7 +192,7 @@ export default function SourceDetail() {
                       <div class="mt-2 flex items-center justify-between text-[11px]">
                         <span class="text-muted">Kind</span>
                         <span class="font-mono uppercase tracking-wider text-ink">
-                          {meta().kind}
+                          {meta().kind === 'signal' ? 'reading' : 'event'}
                         </span>
                       </div>
                     </div>
@@ -201,7 +201,7 @@ export default function SourceDetail() {
                       href={meta().docs}
                       target="_blank"
                       rel="noopener noreferrer"
-                      class="focus-ring mt-5 flex items-center justify-between rounded-xl border border-line px-3 py-2.5 text-[11px] text-muted transition-colors hover:border-line-strong hover:text-ink"
+                      class="focus-ring mt-5 flex items-center justify-between rounded border border-line px-3 py-2.5 text-[11px] text-muted transition-colors hover:border-line-strong hover:text-ink"
                     >
                       API documentation
                       <Icon name="external" size={13} />

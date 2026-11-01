@@ -262,7 +262,7 @@ export function buildBrief(events: PulseEvent[], now: number): BriefItem[] {
     const latest = events[0];
     if (latest) {
       items.push({
-        label: 'Latest signal',
+        label: 'Latest event',
         value: latest.title,
         detail: latest.subtitle,
         source: latest.source,

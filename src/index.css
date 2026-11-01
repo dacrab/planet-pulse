@@ -16,72 +16,68 @@
   --color-success: var(--success);
   --color-sky: var(--sky);
 
-  --font-sans: "Inter Tight", ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
+  --font-sans: "Archivo", ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
     "Segoe UI", sans-serif;
-  --font-display: "Instrument Serif", "Iowan Old Style", Georgia, serif;
-  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+  --font-display: "Archivo", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
 }
 
 :root {
-  --bg: #0a0c0a;
-  --panel: #111411;
-  --panel-2: #171b15;
-  --ink: #edf1e6;
-  --muted: #98a091;
-  --faint: #626b5d;
+  --bg: #111210;
+  --panel: #171815;
+  --panel-2: #1e201b;
+  --ink: #eeece2;
+  --muted: #a3a195;
+  --faint: #727267;
   --line: #ffffff12;
-  --line-strong: #ffffff24;
-  --accent: #c9f25b;
-  --accent-ink: #121805;
-  --danger: #ff7059;
-  --warning: #f5b84b;
-  --success: #72e6a3;
-  --sky: #91b9ff;
-  --map-ocean: #090b08;
-  --map-land: #1c2219;
-  --map-coast: #37412f;
+  --line-strong: #ffffff26;
+  --accent: #ff6a3d;
+  --accent-ink: #1a0a04;
+  --danger: #ff5d5d;
+  --warning: #e3b75d;
+  --success: #84b97a;
+  --sky: #87a9c9;
+  --map-ocean: #0e0f0d;
+  --map-land: #1d1f1a;
+  --map-coast: #3b3f36;
   --map-line: #ffffff0d;
-  --panel-shadow: 0 30px 70px -52px #000, inset 0 1px 0 #ffffff08;
-  --grain-opacity: 0.035;
 
-  --src-earthquake: #ff7a5c;
-  --src-news: #d7a8ff;
-  --src-space: #91b9ff;
-  --src-weather: #5fe0c8;
-  --src-crypto: #d6f45a;
-  --src-sports: #ffb35c;
+  --src-earthquake: #ff6a3d;
+  --src-news: #8fb0c9;
+  --src-space: #a894d6;
+  --src-weather: #5bbfa3;
+  --src-crypto: #d6c45f;
+  --src-sports: #d9a066;
 
   color-scheme: dark;
 }
 
 [data-theme="light"] {
-  --bg: #f3f2ea;
-  --panel: #fbfaf5;
-  --panel-2: #efeee4;
-  --ink: #171a13;
-  --muted: #61685a;
-  --faint: #8b9182;
-  --line: #171a1314;
-  --line-strong: #171a1329;
-  --accent: #405c00;
-  --accent-ink: #f7ffe8;
-  --danger: #c53a24;
-  --warning: #986000;
-  --success: #1d7a48;
-  --sky: #2f5fd0;
-  --map-ocean: #f7f5ec;
-  --map-land: #e5e2d2;
-  --map-coast: #c3bfac;
-  --map-line: #171a130f;
-  --panel-shadow: 0 18px 44px -36px #29301c66, inset 0 1px 0 #ffffff;
-  --grain-opacity: 0.022;
+  --bg: #f1efe6;
+  --panel: #f8f6ee;
+  --panel-2: #e8e5d8;
+  --ink: #1b1b15;
+  --muted: #5f5f54;
+  --faint: #8a8a7c;
+  --line: #1b1b1514;
+  --line-strong: #1b1b1529;
+  --accent: #c2411b;
+  --accent-ink: #fff9f4;
+  --danger: #b23a2a;
+  --warning: #8a5a00;
+  --success: #2f6f45;
+  --sky: #2e5f8a;
+  --map-ocean: #eae7db;
+  --map-land: #dcd7c6;
+  --map-coast: #b7b2a0;
+  --map-line: #1b1b150f;
 
-  --src-earthquake: #d44b30;
-  --src-news: #873bbd;
-  --src-space: #2f5fd0;
-  --src-weather: #0d7d6b;
-  --src-crypto: #557300;
-  --src-sports: #9d5900;
+  --src-earthquake: #c2411b;
+  --src-news: #3d6a86;
+  --src-space: #6b549b;
+  --src-weather: #1c7a66;
+  --src-crypto: #7b6a12;
+  --src-sports: #8c5a24;
 
   color-scheme: light;
 }
@@ -105,34 +101,6 @@
   body {
     min-height: 100dvh;
     background-color: var(--bg);
-    background-image:
-      radial-gradient(
-        1100px 620px at 82% -12%,
-        color-mix(in srgb, var(--accent) 7%, transparent),
-        transparent 65%
-      ),
-      radial-gradient(
-        900px 620px at -12% 28%,
-        color-mix(in srgb, var(--sky) 6%, transparent),
-        transparent 65%
-      ),
-      linear-gradient(
-        180deg,
-        color-mix(in srgb, var(--bg) 96%, #ffffff 4%),
-        var(--bg) 42%
-      );
-    background-attachment: fixed;
-  }
-
-  body::after {
-    content: "";
-    position: fixed;
-    inset: 0;
-    z-index: 100;
-    pointer-events: none;
-    opacity: var(--grain-opacity);
-    mix-blend-mode: soft-light;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.55'/%3E%3C/svg%3E");
   }
 
   #root {
@@ -172,28 +140,22 @@
   .panel {
     position: relative;
     border: 1px solid var(--line);
-    border-radius: 18px;
-    background: color-mix(in srgb, var(--panel) 94%, transparent);
-    box-shadow: var(--panel-shadow);
-    backdrop-filter: blur(14px);
+    border-radius: 4px;
+    background: var(--panel);
   }
 
   .display {
     font-family: var(--font-display);
-    font-weight: 400;
-    letter-spacing: -0.03em;
-  }
-
-  .display em {
-    font-style: italic;
+    font-weight: 600;
+    letter-spacing: -0.04em;
   }
 
   .eyebrow {
-    font-family: var(--font-mono);
+    font-family: var(--font-sans);
     font-size: 9px;
-    font-weight: 500;
+    font-weight: 600;
     line-height: 1.2;
-    letter-spacing: 0.16em;
+    letter-spacing: 0.1em;
     text-transform: uppercase;
   }
 
@@ -245,10 +207,6 @@
     font-size: 10px;
     line-height: 1;
     white-space: nowrap;
-  }
-
-  .pulse-dot {
-    animation: pulse-dot 2.4s ease-out infinite;
   }
 
   .marker-ring {
@@ -305,7 +263,7 @@
     top: -64px;
     left: 16px;
     z-index: 120;
-    border-radius: 10px;
+    border-radius: 4px;
     border: 1px solid var(--line-strong);
     background: var(--panel);
     padding: 10px 14px;
@@ -333,18 +291,6 @@
 @keyframes ticker {
   to {
     transform: translateX(-50%);
-  }
-}
-
-@keyframes pulse-dot {
-  0% {
-    box-shadow: 0 0 0 0 color-mix(in srgb, var(--accent) 55%, transparent);
-  }
-  70% {
-    box-shadow: 0 0 0 7px transparent;
-  }
-  100% {
-    box-shadow: 0 0 0 0 transparent;
   }
 }
 

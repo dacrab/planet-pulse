@@ -49,19 +49,19 @@ export function Ticker() {
 
   return (
     <div
-      class="relative flex h-8 items-center overflow-hidden border-b border-line bg-panel/60"
+      class="relative flex h-8 items-center overflow-hidden border-b border-line bg-panel"
       aria-label="Live headline ticker"
     >
       <div class="relative z-10 flex h-full shrink-0 items-center gap-2 border-r border-line bg-panel px-3 sm:px-4">
         <span class="h-1.5 w-1.5 rounded-full bg-accent" />
-        <span class="eyebrow text-[8px] text-muted">The wire</span>
+        <span class="eyebrow text-[8px] text-muted">Wire</span>
       </div>
 
       <Show
         when={items().length}
         fallback={
           <p class="px-4 font-mono text-[10px] uppercase tracking-wider text-faint">
-            Connecting to live feeds…
+            Connecting to feeds…
           </p>
         }
       >

@@ -31,13 +31,13 @@ export function SeismicPanel() {
   return (
     <Panel
       eyebrow="Seismic"
-      title="Earth's pulse"
+      title="Earthquakes"
       action={
         <A
           href="/sources/earthquake"
           class="focus-ring inline-flex items-center gap-1 rounded text-[10px] text-faint transition-colors hover:text-ink"
         >
-          Explore <Icon name="arrow-right" size={12} />
+          Details <Icon name="arrow-right" size={12} />
         </A>
       }
     >

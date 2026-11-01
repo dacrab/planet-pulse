@@ -9,8 +9,8 @@ export function BriefPanel() {
 
   return (
     <Panel
-      eyebrow="The read"
-      title="Planetary brief"
+      eyebrow="Summary"
+      title="Daily brief"
       action={
         <A
           href="/intelligence"
@@ -25,7 +25,7 @@ export function BriefPanel() {
         when={pulse.brief().length}
         fallback={
           <p class="px-5 py-8 text-center text-xs text-muted">
-            Building the first brief…
+            Building the first summary…
           </p>
         }
       >

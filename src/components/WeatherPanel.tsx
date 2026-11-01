@@ -38,13 +38,13 @@ export function WeatherPanel() {
   return (
     <Panel
       eyebrow="Weather"
-      title="Monitored cities"
+      title="City conditions"
       action={
         <A
           href="/sources/weather"
           class="focus-ring inline-flex items-center gap-1 rounded text-[10px] text-faint transition-colors hover:text-ink"
         >
-          Explore <Icon name="arrow-right" size={12} />
+          Details <Icon name="arrow-right" size={12} />
         </A>
       }
       bodyClass="grid grid-cols-2 gap-1 p-2"
@@ -53,7 +53,7 @@ export function WeatherPanel() {
         when={cities().length}
         fallback={
           <p class="col-span-2 py-6 text-center text-xs text-muted">
-            Waiting for the weather stations…
+            No weather data yet.
           </p>
         }
       >
@@ -62,7 +62,7 @@ export function WeatherPanel() {
             <button
               type="button"
               onClick={() => pulse.openEvent(event.id)}
-              class="focus-ring group rounded-xl border border-transparent p-2.5 text-left transition-colors hover:border-line hover:bg-panel-2/70"
+              class="focus-ring group rounded border border-transparent p-2.5 text-left transition-colors hover:border-line hover:bg-panel-2"
             >
               <div class="flex items-center justify-between gap-2">
                 <span class="text-[11px] text-muted">{event.place}</span>

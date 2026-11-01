@@ -8,7 +8,7 @@ import type { GlobalStatus, IconName } from '../types';
 
 const NAV: Array<{ href: string; label: string; icon: IconName }> = [
   { href: '/', label: 'Overview', icon: 'globe' },
-  { href: '/feed', label: 'The wire', icon: 'feed' },
+  { href: '/feed', label: 'Feed', icon: 'feed' },
   { href: '/sources', label: 'Sources', icon: 'layers' },
   { href: '/intelligence', label: 'Intelligence', icon: 'spark' },
 ];
@@ -31,22 +31,21 @@ export function TopBar() {
   const status = () => STATUS[pulse.status()];
 
   return (
-    <header class="sticky top-0 z-40 border-b border-line bg-bg/80 backdrop-blur-xl">
+    <header class="sticky top-0 z-40 border-b border-line bg-bg">
       <div class="mx-auto flex h-16 w-full max-w-[1500px] items-center gap-3 px-4 sm:px-6">
         <A
           href="/"
           end
-          class="focus-ring group flex shrink-0 items-center gap-2.5 rounded-xl"
+          class="focus-ring group flex shrink-0 items-center gap-2.5 rounded"
           aria-label="Planet Pulse — overview"
         >
-          <span class="relative flex h-8 w-8 items-center justify-center rounded-full border border-line-strong bg-panel-2 text-accent">
+          <span class="flex h-8 w-8 items-center justify-center rounded border border-line-strong bg-panel-2 text-accent">
             <Icon name="pulse" size={16} />
-            <span class="pulse-dot absolute -right-0.5 -top-0.5 h-2 w-2 rounded-full bg-accent" />
           </span>
           <span class="leading-none">
             <span class="display block text-lg leading-none text-ink">Planet Pulse</span>
             <span class="eyebrow mt-1 hidden text-[8px] text-faint sm:block">
-              Live observatory
+              World monitor
             </span>
           </span>
         </A>
@@ -57,7 +56,7 @@ export function TopBar() {
               <A
                 href={item.href}
                 end={item.href === '/'}
-                class="focus-ring rounded-lg px-3 py-2 text-[13px] text-muted transition-colors hover:text-ink"
+                class="focus-ring rounded px-3 py-2 text-[13px] text-muted transition-colors hover:text-ink"
                 activeClass="!text-ink bg-panel-2"
               >
                 {item.label}
@@ -67,7 +66,7 @@ export function TopBar() {
         </nav>
 
         <div class="ml-auto flex items-center gap-1.5">
-          <div class="mr-1 hidden items-center gap-2 rounded-lg px-2 py-1 xl:flex">
+          <div class="mr-1 hidden items-center gap-2 rounded px-2 py-1 xl:flex">
             <Icon name="clock" size={13} class="text-faint" />
             <span class="font-mono text-[11px] tabular-nums text-muted">
               {clockTime(pulse.now())}
@@ -76,7 +75,7 @@ export function TopBar() {
           </div>
 
           <div
-            class="hidden items-center gap-1.5 rounded-full border border-line bg-panel-2/70 px-2.5 py-1 text-[10px] font-medium sm:flex"
+            class="hidden items-center gap-1.5 rounded border border-line bg-panel-2 px-2.5 py-1 text-[10px] font-medium sm:flex"
             aria-live="polite"
             title={`Feed status: ${status().label}`}
           >

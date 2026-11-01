@@ -5,7 +5,7 @@ import type { IconName } from '../types';
 
 const ITEMS: Array<{ href: string; label: string; icon: IconName }> = [
   { href: '/', label: 'Overview', icon: 'globe' },
-  { href: '/feed', label: 'Wire', icon: 'feed' },
+  { href: '/feed', label: 'Feed', icon: 'feed' },
   { href: '/sources', label: 'Sources', icon: 'layers' },
   { href: '/intelligence', label: 'Alerts', icon: 'spark' },
 ];
@@ -13,7 +13,7 @@ const ITEMS: Array<{ href: string; label: string; icon: IconName }> = [
 export function MobileNav() {
   return (
     <nav
-      class="fixed inset-x-0 bottom-0 z-40 border-t border-line bg-bg/90 pb-[env(safe-area-inset-bottom)] backdrop-blur-xl lg:hidden"
+      class="fixed inset-x-0 bottom-0 z-40 border-t border-line bg-bg pb-[env(safe-area-inset-bottom)] lg:hidden"
       aria-label="Primary"
     >
       <div class="mx-auto flex max-w-lg">
