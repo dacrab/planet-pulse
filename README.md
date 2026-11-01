@@ -1,59 +1,88 @@
 # Planet Pulse
 
-Real-time global event monitoring dashboard. Aggregates 6 live data streams into a single feed with filtering, alerts, and cross-source correlation detection.
+A live planetary observatory: six public feeds — earthquakes, world news, the ISS, weather, markets and football fixtures — merged into one reactive surface.
 
-## Data Sources
+Built as a deliberate showcase of SolidJS. No API keys, no proxy, no backend, no tracking.
 
-- **Earthquakes** — USGS seismic feed (worldwide, updated every 60s)
-- **News** — Reddit /r/worldnews top posts
-- **Space** — ISS position tracking (10s interval)
-- **Weather** — Open-Meteo for New York, London, Tokyo, Sydney
-- **Crypto** — CoinGecko top 20 by market cap
-- **Sports** — TheSportsDB daily soccer matches
-
-## Features
-
-- Live feed with automatic polling and visibility-aware pausing
-- Filter by source, time range, or free-text search
-- Cross-source correlation detection (e.g. earthquakes near monitored cities)
-- Alert system with tiered severity (action / watch)
-- Reactive connection status indicator
-- Full-viewport layout with independent scrolling panels
-
-## Setup
+## Run it
 
 ```bash
 bun install
-bun dev
-```
-
-Production build:
-
-```bash
+bun dev        # http://localhost:5173
+bun run typecheck
 bun run build
+bun run preview
 ```
 
-## Stack
+## Routes
 
-- SolidJS (fine-grained reactivity, Suspense, ErrorBoundary)
-- TypeScript
-- Tailwind CSS v4
-- Vite
+| Route | What it is |
+| --- | --- |
+| `/` | Overview: world map, signal of the hour, vitals, three domain panels, live wire |
+| `/feed` | Searchable, filterable, paged timeline across every source |
+| `/sources` | Per-source health, latency, cadence and sparklines |
+| `/sources/:source` | Detail view for one feed with its own search |
+| `/intelligence` | Derived cross-signal correlations, alerts, range checks and method |
+| `*` | 404 |
+
+Open an event from anywhere and the drawer is encoded in the URL (`?event=…`), so it can be linked and survives reloads.
+
+## Data sources
+
+Every request runs in the browser against a public, CORS-enabled endpoint.
+
+| Source | Endpoint | Cadence |
+| --- | --- | --- |
+| Earthquakes | USGS `all_day.geojson` | 60s |
+| World news | ok.surf Google News feed | 5m |
+| Orbital | wheretheiss.at ISS position | 10s |
+| Weather | Open-Meteo, six cities | 10m |
+| Markets | Binance public 24h tickers | 20s |
+| Fixtures | TheSportsDB daily soccer | 15m |
+
+Polling pauses when the tab is hidden, when the observatory is paused, or when the browser is offline. A failed source is isolated: its last data stays visible while the next poll retries.
+
+## SolidJS features used
+
+- **Fine-grained reactivity** — signals, memos, `createEffect`, `batch`, `untrack`
+- **Stores** — a single `createStore` for filters and a `produce`-updated ISS trail
+- **Async** — `createResource` per source, `Suspense` route fallback, `ErrorBoundary`
+- **Scheduling** — `createDeferred` search input, `useTransition` for filters
+- **Selection** — `createSelector` for event-row highlighting
+- **Composition** — `Show`, `For`, `Index`, `Switch`/`Match`, `Dynamic`
+- **Props** — `mergeProps`, `splitProps`, `children`
+- **Lifecycle** — `onMount`, `onCleanup`, custom hooks
+- **DOM** — `ref`, `classList`, `Portal`, custom directives (`use:focus`, `use:reveal`)
+- **Router/meta** — lazy routes, `@solidjs/router`, title/meta tags, URL search params
+- **Context** — one `PulseProvider` reactive core instead of stacked stores
 
 ## Architecture
 
 ```
 src/
-  components/   UI components (Dashboard, EventFeed, FilterPanel, etc.)
-  stores/       Reactive state (polling factory, aggregator, intelligence)
-  services/     API fetch functions (one per data source)
-  types/        TypeScript interfaces
-  utils/        Formatters, color mapping
-  hooks/        useVisibility (page visibility API)
-  config/       API endpoints and intervals
+  App.tsx                 router + lazy routes
+  index.tsx               entry
+  index.css               design tokens, themes, component CSS
+  types.ts                PulseEvent, filters, correlations, alerts
+  data/
+    sources.ts            six adapters + source registry
+    world.ts              map projection helpers
+    land.ts               Natural Earth land path (generated)
+  lib/
+    format.ts             clock, relative time, prices, numbers
+    analysis.ts           correlations, alerts, brief, rankings
+  hooks/                  now, online, visibility, persisted signal
+  stores/pulse.tsx        the reactive core (PulseProvider / usePulse)
+  directives.ts           focus + reveal
+  components/             shell, map, panels, command palette, drawer
+  routes/                 overview, feed, sources, source detail, intelligence, 404
 ```
 
-All data flows through a polling factory that creates independent reactive stores per source. The aggregator merges and filters them. Intelligence and insights layers derive alerts and correlations from the combined event stream.
+The old layered stores/services/config split was replaced with one provider that owns source runtimes, filters, derived analysis, theme, playback state and URL selection. Source adapters normalize everything into one `PulseEvent` shape with optional metrics, geo and search text.
+
+## Design
+
+Warm dark and light themes, acid-lime accent, Instrument Serif display type, Inter Tight UI type and JetBrains Mono for data. The world map is generated offline from Natural Earth 110m land polygons and drawn as a single SVG path. Motion respects `prefers-reduced-motion`.
 
 ## License
 

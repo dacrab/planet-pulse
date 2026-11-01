@@ -1,8 +1,9 @@
 import { createSignal, onCleanup } from 'solid-js';
 
-export function useNow(intervalMs = 1000) {
+/** A shared-ish clock signal for relative timestamps. */
+export function useNow(intervalMs = 1_000) {
   const [now, setNow] = createSignal(Date.now());
-  const id = setInterval(() => setNow(Date.now()), intervalMs);
-  onCleanup(() => clearInterval(id));
+  const timer = setInterval(() => setNow(Date.now()), intervalMs);
+  onCleanup(() => clearInterval(timer));
   return now;
 }

@@ -1,36 +1,89 @@
-import { Index, Show } from 'solid-js';
-import { createMemo } from 'solid-js';
-import { useStore } from '../stores/context';
-import { WeatherEvent } from '../types/events';
+import { For, Show, createMemo } from 'solid-js';
+import { A } from '@solidjs/router';
+import { usePulse } from '../stores/pulse';
+import { Icon } from './Icon';
+import { Panel } from './UI';
+import type { IconName, PulseEvent } from '../types';
 
-const conditionIcon: Record<string, string> = {
-  Clear: '☀️', Cloudy: '☁️', Rainy: '🌧️', Snowy: '❄️', Stormy: '⛈️',
-};
+function weatherIcon(event: PulseEvent): IconName {
+  const condition = event.tags[0] ?? '';
+  if (condition.includes('storm') || condition.includes('thunder')) return 'storm';
+  if (condition.includes('snow')) return 'snow';
+  if (
+    condition.includes('rain') ||
+    condition.includes('drizzle') ||
+    condition.includes('shower')
+  ) {
+    return 'rain';
+  }
+  if (
+    condition.includes('cloud') ||
+    condition.includes('overcast') ||
+    condition.includes('fog')
+  ) {
+    return 'cloud';
+  }
+  return event.tags.includes('night') ? 'moon' : 'sun';
+}
 
 export function WeatherPanel() {
-  const { aggregator } = useStore();
+  const pulse = usePulse();
   const cities = createMemo(() =>
-    aggregator.allEvents().filter((e): e is WeatherEvent => e.source === 'weather')
+    pulse
+      .events()
+      .filter((event) => event.source === 'weather')
+      .sort((a, b) => (a.place ?? '').localeCompare(b.place ?? ''))
   );
 
   return (
-    <Show when={cities().length > 0}>
-      <div class="p-5 border-b border-border">
-        <p class="text-xs font-semibold text-content-muted uppercase tracking-widest mb-3">Weather</p>
-        <div class="grid grid-cols-2 gap-2">
-          <Index each={cities()}>
-            {(city) => (
-              <div class="bg-surface rounded-lg px-3 py-2.5 border border-border">
-                <p class="text-[11px] text-content-muted mb-1">{city().location}</p>
-                <div class="flex items-center justify-between">
-                  <span class="text-sm font-semibold text-content">{city().temperature.toFixed(0)}°C</span>
-                  <span class="text-base leading-none">{conditionIcon[city().condition] ?? '🌡️'}</span>
-                </div>
+    <Panel
+      eyebrow="Weather"
+      title="Monitored cities"
+      action={
+        <A
+          href="/sources/weather"
+          class="focus-ring inline-flex items-center gap-1 rounded text-[10px] text-faint transition-colors hover:text-ink"
+        >
+          Explore <Icon name="arrow-right" size={12} />
+        </A>
+      }
+      bodyClass="grid grid-cols-2 gap-1 p-2"
+    >
+      <Show
+        when={cities().length}
+        fallback={
+          <p class="col-span-2 py-6 text-center text-xs text-muted">
+            Waiting for the weather stations…
+          </p>
+        }
+      >
+        <For each={cities()}>
+          {(event) => (
+            <button
+              type="button"
+              onClick={() => pulse.openEvent(event.id)}
+              class="focus-ring group rounded-xl border border-transparent p-2.5 text-left transition-colors hover:border-line hover:bg-panel-2/70"
+            >
+              <div class="flex items-center justify-between gap-2">
+                <span class="text-[11px] text-muted">{event.place}</span>
+                <Icon
+                  name={weatherIcon(event)}
+                  size={15}
+                  class="text-[var(--src-weather)]"
+                />
               </div>
-            )}
-          </Index>
-        </div>
-      </div>
-    </Show>
+              <div class="mt-1 flex items-baseline gap-2">
+                <span class="display text-2xl leading-none text-ink">
+                  {Math.round(event.value ?? 0)}°
+                </span>
+                <span class="truncate text-[10px] text-faint">
+                  {event.tags[0]}
+                </span>
+              </div>
+            </button>
+          )}
+        </For>
+      </Show>
+    </Panel>
   );
 }

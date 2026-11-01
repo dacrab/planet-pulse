@@ -1,18 +1,54 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="theme-color" content="#030712" />
-    <meta name="description" content="Real-time dashboard aggregating live data from 6 sources: earthquakes, flights, ISS position, weather, cryptocurrency prices, and GitHub activity." />
+    <meta
+      name="description"
+      content="Planet Pulse is a live world observatory: earthquakes, headlines, the ISS, weather, markets and football fixtures in one reactive surface."
+    />
+    <meta name="theme-color" content="#0a0c0a" media="(prefers-color-scheme: dark)" />
+    <meta name="theme-color" content="#f3f2ea" media="(prefers-color-scheme: light)" />
 
-    <!-- Favicon -->
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2220%22 fill=%22%231f2937%22/><circle cx=%2250%22 cy=%2250%22 r=%2215%22 fill=%22%239ca3af%22/></svg>" />
+    <script>
+      (() => {
+        try {
+          const stored = localStorage.getItem('pulse:theme');
+          const theme = stored
+            ? JSON.parse(stored)
+            : window.matchMedia('(prefers-color-scheme: light)').matches
+              ? 'light'
+              : 'dark';
+          document.documentElement.dataset.theme = theme === 'light' ? 'light' : 'dark';
+          document.documentElement.style.colorScheme = theme;
+        } catch {
+          document.documentElement.dataset.theme = 'dark';
+        }
+      })();
+    </script>
 
-    <title>Global Events Dashboard</title>
+    <link
+      rel="icon"
+      href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 64 64%22><rect width=%2264%22 height=%2264%22 rx=%2216%22 fill=%22%230a0c0a%22/><path d=%22M10 34h10l5-13 8 26 5-13h16%22 fill=%22none%22 stroke=%22%23c9f25b%22 stroke-width=%223%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22/></svg>"
+    />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter+Tight:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
+
+    <title>Planet Pulse — Live World Observatory</title>
   </head>
   <body>
     <div id="root"></div>
+    <noscript>
+      <p style="font-family: system-ui; padding: 24px">
+        Planet Pulse is a live, client-rendered observatory. Please enable
+        JavaScript to view the feeds.
+      </p>
+    </noscript>
     <script src="/src/index.tsx" type="module"></script>
   </body>
 </html>
