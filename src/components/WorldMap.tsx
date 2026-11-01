@@ -331,25 +331,37 @@ export function WorldMap() {
         </svg>
 
         <Show when={hover()}>
-          {(item) => (
-            <div
-              class="pointer-events-none absolute z-30 w-56 -translate-x-1/2 -translate-y-[calc(100%+14px)] rounded border border-line-strong bg-panel p-3"
-              style={{
-                left: `${(item().x / WORLD_WIDTH) * 100}%`,
-                top: `${(item().y / WORLD_HEIGHT) * 100}%`,
-              }}
-            >
-              <SourceTag source={item().event.source} />
-              <p class="mt-1.5 line-clamp-2 text-xs font-medium leading-snug text-ink">
-                {item().event.title}
-              </p>
-              <p class="mt-1 text-[10px] text-muted">{item().event.subtitle}</p>
-              <div class="mt-2 flex items-center justify-between font-mono text-[9px] uppercase tracking-wider text-faint">
-                <span>{SOURCE_BY_ID[item().event.source].label}</span>
-                <span>{timeAgoLabel(item().event.timestamp, pulse.now())}</span>
+          {(item) => {
+            const x = () => (item().x / WORLD_WIDTH) * 100;
+            const y = () => (item().y / WORLD_HEIGHT) * 100;
+            const below = () => y() < 20;
+
+            return (
+              <div
+                class={`pointer-events-none absolute z-50 w-56 -translate-x-1/2 rounded border border-line-strong bg-panel p-3 ${
+                  below()
+                    ? 'translate-y-[14px]'
+                    : '-translate-y-[calc(100%+14px)]'
+                }`}
+                style={{
+                  left: `clamp(7rem, ${x()}%, calc(100% - 7rem))`,
+                  top: below() ? `${y()}%` : `clamp(10rem, ${y()}%, 100%)`,
+                }}
+              >
+                <SourceTag source={item().event.source} />
+                <p class="mt-1.5 line-clamp-2 text-xs font-medium leading-snug text-ink">
+                  {item().event.title}
+                </p>
+                <p class="mt-1 text-[10px] text-muted">
+                  {item().event.subtitle}
+                </p>
+                <div class="mt-2 flex items-center justify-between font-mono text-[9px] uppercase tracking-wider text-faint">
+                  <span>{SOURCE_BY_ID[item().event.source].label}</span>
+                  <span>{timeAgoLabel(item().event.timestamp, pulse.now())}</span>
+                </div>
               </div>
-            </div>
-          )}
+            );
+          }}
         </Show>
       </div>
 
