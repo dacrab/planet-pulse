@@ -1,49 +1,31 @@
 # Planet Pulse
 
-A live dashboard of what's happening on Earth right now.
+Six live feeds on one screen: earthquakes, world headlines, the ISS, weather, markets, football.
 
 **Live demo:** https://planet-pulse-pi.vercel.app
 
-Earthquakes, world headlines, the space station, weather in six cities, crypto prices, and football fixtures — all in one place. Open any event for the details, search the whole timeline, or check how each feed is doing. Everything runs in your browser, with no accounts and no tracking.
+It's a dashboard for the planet's current mood. The overview maps the last day of seismic activity, names the biggest signal, shows a panel per domain and lists what just happened. From there you can search the whole timeline, open any event for its numbers, or check whether a source is healthy or sulking.
 
-## Features
+## On the dashboard
 
-- Earthquakes from the last 24 hours, mapped and listed
-- World headlines, refreshed every few minutes
-- The ISS tracked in real time, with altitude and speed
-- Current weather for six cities around the world
-- Live prices for 16 cryptocurrencies
-- Today's football fixtures with league and venue
-- One searchable timeline across every source
-- `⌘K` / `Ctrl K` to jump anywhere
+- A world map you can zoom and pan, with events pinned to it
+- A filterable, paged timeline across all six sources
+- Per-source latency and cadence, so silence has an explanation
+- An "intelligence" page that lines sources up against each other
+- City sheets: weather, nearest quake, ISS distance, related headlines
+- `⌘K` / `Ctrl K` for the command palette
 
-## Run it locally
-
-You'll need [Bun](https://bun.sh) installed.
+## Running it
 
 ```bash
 bun install
 bun dev        # http://localhost:5173
 ```
 
-To build for production:
+## About the feeds
 
-```bash
-bun run build
-```
+No keys, no proxy, no server of its own — every request goes from your browser to a public API: USGS for quakes, Google News via ok.surf, wheretheiss.at, Open-Meteo, Binance and TheSportsDB.
 
-## Good to know
+Each polls at its own pace, and all of them stop while the tab is hidden or you're offline. A broken feed keeps its last data on screen instead of blanking the panel. Headlines are matched to cities by text, so those links are approximate. Prices are informational, not financial advice.
 
-- All data comes from free, public APIs (USGS, Google News via ok.surf, wheretheiss.at, Open-Meteo, Binance, TheSportsDB) and loads straight from your browser.
-- Feeds refresh at their own pace, and polling pauses when the tab is hidden or you're offline.
-- If a source goes down, its last data stays on screen while it retries.
-- Matching headlines to cities is approximate — the news feed has no place metadata.
-- Prices are for information only, not financial advice.
-
-## Built with
-
-SolidJS, TypeScript, Vite, and Tailwind CSS. Hosted on Vercel.
-
-## License
-
-MIT
+SolidJS and Vite, hosted on Vercel. MIT.
