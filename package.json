@@ -9,10 +9,10 @@
     "typecheck": "tsc --noEmit"
   },
   "devDependencies": {
-    "@tailwindcss/vite": "4.3.3",
-    "tailwindcss": "4.3.3",
+    "@tailwindcss/vite": "4.3.4",
+    "tailwindcss": "4.3.4",
     "vite": "8.3.5",
-    "vite-plugin-solid": "2.11.14",
+    "vite-plugin-solid": "2.11.15",
     "typescript": "6.0.3"
   },
   "dependencies": {
