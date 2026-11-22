@@ -12,7 +12,7 @@
     "@tailwindcss/vite": "4.3.5",
     "tailwindcss": "4.3.5",
     "vite": "8.3.8",
-    "vite-plugin-solid": "2.11.16",
+    "vite-plugin-solid": "2.11.17",
     "typescript": "6.0.3"
   },
   "dependencies": {
